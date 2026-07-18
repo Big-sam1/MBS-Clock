@@ -1,14 +1,24 @@
 {
-  "cleanUrls": true,
+  "version": 2,
+  "builds": [
+    { "src": "api/*.js", "use": "@vercel/node" },
+    { "src": "css/**", "use": "@vercel/static" },
+    { "src": "js/**", "use": "@vercel/static" },
+    { "src": "images/**", "use": "@vercel/static" },
+    { "src": "assets/**", "use": "@vercel/static" },
+    { "src": "index.html", "use": "@vercel/static" },
+    { "src": "manifest.json", "use": "@vercel/static" },
+    { "src": "service-worker.js", "use": "@vercel/static" }
+  ],
   "routes": [
     { "src": "/api/chat", "dest": "api/chat.js" },
     { "src": "/api/weather", "dest": "api/weather.js" },
-    { "src": "/manifest.json", "dest": "/manifest.json" },
-    { "src": "/service-worker.js", "dest": "/service-worker.js" },
     { "src": "/images/(.*)", "dest": "/images/$1" },
     { "src": "/css/(.*)", "dest": "/css/$1" },
     { "src": "/js/(.*)", "dest": "/js/$1" },
     { "src": "/assets/(.*)", "dest": "/assets/$1" },
+    { "src": "/manifest.json", "dest": "/manifest.json" },
+    { "src": "/service-worker.js", "dest": "/service-worker.js" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
