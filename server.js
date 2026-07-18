@@ -49,6 +49,38 @@ app.post("/api/chat", async (req, res) => {
     }
 });
 
+// Proxy route for secure Weather API calls
+app.get("/api/weather", async (req, res) => {
+    try {
+        const query = req.query.q;
+        if (!query) {
+            return res.status(400).json({ error: "Query parameter 'q' is required" });
+        }
+
+        const apiKey = process.env.WEATHER_API_KEY;
+        if (!apiKey) {
+            return res.status(500).json({ error: "WEATHER_API_KEY is not configured in .env" });
+        }
+
+        const response = await fetch(`https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${encodeURIComponent(query)}&aqi=no`);
+        
+        if (!response.ok) {
+            const errData = await response.json();
+            return res.status(response.status).json({ 
+                error: (errData.error && errData.error.message) || "Failed to fetch weather from provider" 
+            });
+        }
+
+        const data = await response.json();
+        res.json(data);
+    } catch (error) {
+        console.error("Local weather request error:", error);
+        res.status(500).json({
+            error: error.message || "Failed to process weather request"
+        });
+    }
+});
+
 // Handle SPA routing fallbacks if needed (always serve index.html for undefined GET routes)
 app.get("*", (req, res) => {
     res.sendFile(path.join(__dirname, "index.html"));
