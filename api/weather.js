@@ -13,9 +13,24 @@ module.exports = async (req, res) => {
         return;
     }
 
-    const query = req.query.q;
+    let query = req.query.q;
     if (!query) {
         return res.status(400).json({ error: "Missing query parameter 'q'" });
+    }
+
+    // Resolve real user location if falling back to IP location
+    if (query === 'auto:ip') {
+        const vercelLat = req.headers['x-vercel-ip-latitude'];
+        const vercelLon = req.headers['x-vercel-ip-longitude'];
+        if (vercelLat && vercelLon) {
+            query = `${vercelLat},${vercelLon}`;
+        } else {
+            const clientIp = req.headers['x-forwarded-for'] || req.headers['x-real-ip'];
+            if (clientIp) {
+                // Get the client's actual IP (first item in comma-separated proxy list)
+                query = clientIp.split(',')[0].trim();
+            }
+        }
     }
 
     const apiKey = process.env.WEATHER_API_KEY;

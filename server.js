@@ -52,9 +52,17 @@ app.post("/api/chat", async (req, res) => {
 // Proxy route for secure Weather API calls
 app.get("/api/weather", async (req, res) => {
     try {
-        const query = req.query.q;
+        let query = req.query.q;
         if (!query) {
             return res.status(400).json({ error: "Query parameter 'q' is required" });
+        }
+
+        // Resolve real client IP local fallback
+        if (query === 'auto:ip') {
+            const clientIp = req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || req.socket.remoteAddress;
+            if (clientIp && clientIp !== '::1' && clientIp !== '127.0.0.1') {
+                query = clientIp.split(',')[0].trim();
+            }
         }
 
         const apiKey = process.env.WEATHER_API_KEY;
