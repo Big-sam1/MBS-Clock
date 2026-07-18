@@ -1280,25 +1280,23 @@ function startAlarmChecker(){
 }
 
 function triggerAlarm(a){
-  // Remove any existing alarm dialog
+  // Remove any existing alarm overlay
   var old = document.getElementById('_alarm_dialog');
-  if(old) old.parentNode.removeChild(old);
+  if(old && old.parentNode) old.parentNode.removeChild(old);
 
   currentAlarm = a;
 
-  // Build native <dialog> — browser places this in its own TOP LAYER
-  // above ALL z-index, CSS stacking contexts, and overlays
-  var dlg = document.createElement('dialog');
+  // Use a plain div with maximum z-index — avoids ALL dialog/backdrop pointer-event bugs
+  var dlg = document.createElement('div');
   dlg.id = '_alarm_dialog';
   dlg.style.cssText = [
-    'border:none',
-    'padding:0',
-    'background:#020409',
-    'border-radius:0',
+    'position:fixed',
+    'inset:0',
     'width:100vw',
     'height:100vh',
-    'max-width:100vw',
-    'max-height:100vh',
+    'background:#020409',
+    'background-image:radial-gradient(circle at center,#111827 0%,#030712 100%)',
+    'z-index:2147483647',
     'display:flex',
     'flex-direction:column',
     'align-items:center',
@@ -1306,59 +1304,53 @@ function triggerAlarm(a){
     'gap:1.5rem',
     'font-family:system-ui,sans-serif',
     'color:#fff',
-    'overflow:hidden'
+    'overflow:hidden',
+    'pointer-events:all'
   ].join(';');
 
   dlg.innerHTML = [
     '<div style="text-align:center">',
-      '<div style="font-size:4rem;margin-bottom:.5rem">⏰</div>',
+      '<div style="font-size:4rem;margin-bottom:.5rem;animation:wobble .6s infinite">⏰</div>',
       '<div style="font-size:1rem;font-weight:700;opacity:.7">'+escHtml(a.time||'')+'</div>',
     '</div>',
     '<div style="font-size:2.2rem;font-weight:800;text-align:center;padding:0 2rem">'+escHtml(a.title||'Alarm')+'</div>',
     '<div style="color:rgba(255,255,255,.55);text-align:center;max-width:380px;padding:0 1.5rem;font-size:.95rem">'+escHtml(a.desc||'Time to act!')+'</div>',
-    '<div style="display:flex;gap:28px;margin-top:1rem">',
-      '<button id="_asnooze" style="',
+    '<div style="display:flex;gap:28px;margin-top:1rem;pointer-events:all">',
+      '<button onclick="snoozeAlarm()" style="',
         'display:flex;flex-direction:column;align-items:center;gap:10px;',
         'cursor:pointer;background:none;border:none;color:#fff;',
-        'font-size:.9rem;font-weight:700;padding:.5rem 1rem;border-radius:12px',
+        'font-size:.9rem;font-weight:700;padding:.5rem 1rem;border-radius:12px;',
+        'pointer-events:all',
       '">',
         '<span style="width:70px;height:70px;border-radius:50%;background:#f59e0b;display:flex;align-items:center;justify-content:center;font-size:1.8rem;box-shadow:0 4px 24px rgba(245,158,11,.6)">💤</span>',
         'Snooze 10m',
       '</button>',
-      '<button id="_adismiss" style="',
+      '<button onclick="dismissAlarm()" style="',
         'display:flex;flex-direction:column;align-items:center;gap:10px;',
         'cursor:pointer;background:none;border:none;color:#fff;',
-        'font-size:.9rem;font-weight:700;padding:.5rem 1rem;border-radius:12px',
+        'font-size:.9rem;font-weight:700;padding:.5rem 1rem;border-radius:12px;',
+        'pointer-events:all',
       '">',
         '<span style="width:70px;height:70px;border-radius:50%;background:#ef4444;display:flex;align-items:center;justify-content:center;font-size:1.8rem;box-shadow:0 4px 24px rgba(239,68,68,.6)">✕</span>',
         'Dismiss',
       '</button>',
-      '<button id="_acomplete" style="',
+      '<button onclick="completeAlarm()" style="',
         'display:flex;flex-direction:column;align-items:center;gap:10px;',
         'cursor:pointer;background:none;border:none;color:#fff;',
-        'font-size:.9rem;font-weight:700;padding:.5rem 1rem;border-radius:12px',
+        'font-size:.9rem;font-weight:700;padding:.5rem 1rem;border-radius:12px;',
+        'pointer-events:all',
       '">',
         '<span style="width:70px;height:70px;border-radius:50%;background:#10b981;display:flex;align-items:center;justify-content:center;font-size:1.8rem;box-shadow:0 4px 24px rgba(16,185,129,.6)">✓</span>',
         'Complete',
       '</button>',
     '</div>',
-    '<div style="display:flex;gap:2rem;margin-top:.5rem">',
-      '<button id="_aspeak" style="background:none;border:none;color:rgba(255,255,255,.45);cursor:pointer;font-size:.82rem;text-decoration:underline">🔊 Speak again</button>',
-      '<button id="_asilence" style="background:none;border:none;color:rgba(255,255,255,.45);cursor:pointer;font-size:.82rem;text-decoration:underline">🔇 Silence</button>',
+    '<div style="display:flex;gap:2rem;margin-top:.5rem;pointer-events:all">',
+      '<button onclick="if(currentAlarm)speak(\'Time for: \'+currentAlarm.title)" style="background:none;border:none;color:rgba(255,255,255,.45);cursor:pointer;font-size:.82rem;text-decoration:underline;pointer-events:all">🔊 Speak again</button>',
+      '<button onclick="stopAudio()" style="background:none;border:none;color:rgba(255,255,255,.45);cursor:pointer;font-size:.82rem;text-decoration:underline;pointer-events:all">🔇 Silence</button>',
     '</div>'
   ].join('');
 
   document.body.appendChild(dlg);
-
-  // showModal() puts dialog in browser top layer — nothing can sit above it
-  dlg.showModal();
-
-  // Wire up buttons directly — no delegation, no inline onclick
-  dlg.querySelector('#_asnooze').addEventListener('click',   function(e){ e.stopPropagation(); snoozeAlarm(); });
-  dlg.querySelector('#_adismiss').addEventListener('click',  function(e){ e.stopPropagation(); dismissAlarm(); });
-  dlg.querySelector('#_acomplete').addEventListener('click', function(e){ e.stopPropagation(); completeAlarm(); });
-  dlg.querySelector('#_aspeak').addEventListener('click',    function(e){ e.stopPropagation(); if(currentAlarm) speak('Time for: '+currentAlarm.title); });
-  dlg.querySelector('#_asilence').addEventListener('click',  function(e){ e.stopPropagation(); stopAudio(); });
 
   // Play sound & voice
   playSound(a.sound||'classic', settings.alarmVolume);
@@ -1366,6 +1358,7 @@ function triggerAlarm(a){
   if('vibrate' in navigator) navigator.vibrate([500,300,500,300,500]);
   sendNotification('\u23f0 Alarm: '+a.title, a.desc||'');
 }
+
 
 function stopRing(){
   try{

@@ -1,6 +1,6 @@
 /* MBS Smart Clock - Service Worker for PWA Offline Support */
 
-const CACHE_NAME = 'mbs-clock-v3';
+const CACHE_NAME = 'mbs-clock-v4';
 
 const ASSETS_TO_CACHE = [
   '/',
