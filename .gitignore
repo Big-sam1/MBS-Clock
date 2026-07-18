@@ -1,6 +1,10 @@
-# Private API credentials — NEVER commit these files to GitHub
+# Private API credentials — NEVER commit these to GitHub
+.env
 config.js
 config.example.js
+
+# Dependencies
+node_modules/
 
 # OS files
 .DS_Store

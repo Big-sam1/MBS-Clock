@@ -1,51 +1,61 @@
-/* Smart Alarm Pro - Zero Dependency Local Development Server */
+require("dotenv").config();
 
-const http = require('http');
-const fs = require('fs');
-const path = require('path');
+const express = require("express");
+const cors = require("cors");
+const Groq = require("groq-sdk");
+const path = require("path");
 
-const PORT = 3000;
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-const MIME_TYPES = {
-  '.html': 'text/html',
-  '.css': 'text/css',
-  '.js': 'text/javascript',
-  '.json': 'application/json',
-  '.png': 'image/png',
-  '.jpg': 'image/jpeg',
-  '.svg': 'image/svg+xml',
-  '.ico': 'image/x-icon',
-  '.wav': 'audio/wav',
-  '.mp3': 'audio/mpeg'
-};
+app.use(cors());
+app.use(express.json());
 
-http.createServer((req, res) => {
-  // Clean up URL paths to prevent path traversal issues
-  let safePath = req.url.split('?')[0];
-  if (safePath === '/') {
-    safePath = '/index.html';
-  }
+// Serve static frontend files from the root directory
+app.use(express.static(path.join(__dirname)));
 
-  const filePath = path.join(__dirname, safePath);
-  const extname = String(path.extname(filePath)).toLowerCase();
-  const contentType = MIME_TYPES[extname] || 'application/octet-stream';
+const groq = new Groq({
+    apiKey: process.env.GROQ_API_KEY
+});
 
-  fs.readFile(filePath, (error, content) => {
-    if (error) {
-      if (error.code === 'ENOENT') {
-        res.writeHead(404, { 'Content-Type': 'text/plain' });
-        res.end('404 File Not Found', 'utf-8');
-      } else {
-        res.writeHead(500, { 'Content-Type': 'text/plain' });
-        res.end('500 Internal Server Error: ' + error.code, 'utf-8');
-      }
-    } else {
-      res.writeHead(200, { 'Content-Type': contentType });
-      res.end(content, 'utf-8');
+// Proxy route for secure Groq AI calls
+app.post("/api/chat", async (req, res) => {
+    try {
+        const systemPrompt = req.body.systemPrompt || "You are a helpful assistant.";
+        const userPrompt = req.body.userPrompt;
+
+        if (!userPrompt) {
+            return res.status(400).json({ error: "userPrompt is required" });
+        }
+
+        const response = await groq.chat.completions.create({
+            messages: [
+                { role: "system", content: systemPrompt },
+                { role: "user", content: userPrompt }
+            ],
+            model: "llama-3.3-70b-versatile",
+            temperature: 0.7,
+            max_tokens: 512
+        });
+
+        res.json({
+            reply: response.choices[0].message.content
+        });
+    } catch (error) {
+        console.error("Groq backend request error:", error);
+        res.status(500).json({
+            error: error.message || "AI request failed"
+        });
     }
-  });
-}).listen(PORT, () => {
-  console.log(`Smart Alarm Pro Server is running!`);
-  console.log(`Access the application at: http://localhost:${PORT}/`);
-  console.log(`Press Ctrl+C to terminate the server.`);
+});
+
+// Handle SPA routing fallbacks if needed (always serve index.html for undefined GET routes)
+app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "index.html"));
+});
+
+app.listen(PORT, () => {
+    console.log(`Smart Alarm Pro Server is running!`);
+    console.log(`Access the application at: http://localhost:${PORT}/`);
+    console.log(`Press Ctrl+C to terminate the server.`);
 });

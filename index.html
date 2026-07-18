@@ -279,6 +279,8 @@ select.form-control{appearance:none;background-image:url("data:image/svg+xml,%3C
 </style>
 <!-- Supabase CDN Client Library -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- Load private API credentials from config.js (gitignored) -->
+<script src="config.js"></script>
 </head>
 <body>
 
@@ -913,10 +915,11 @@ var weatherData = null;
 var activeTimerTab = 'sw';
 
 // ── API CREDENTIALS ──
-var SUPABASE_URL = "https://aqyibkafjvpsyrlernun.supabase.co";
-var SUPABASE_ANON_KEY = "sb_publishable_sUTb4wvyUeQc7qTtRo_8TA_MI7ZlWso";
+// Read from config.js (window.*) — fallback to hardcoded for local use
+var SUPABASE_URL      = window.SUPABASE_URL      || 'https://aqyibkafjvpsyrlernun.supabase.co';
+var SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'sb_publishable_sUTb4wvyUeQc7qTtRo_8TA_MI7ZlWso';
 var supabase = null;
-if (window.supabase) {
+if (window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY) {
   try {
     supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   } catch (e) {
@@ -924,8 +927,8 @@ if (window.supabase) {
   }
 }
 
-const GROQ_API_KEY = "";
-var FREESOUND_TOKEN = "b69b7e3V5UAstcpzB6LMSmif12V6OruDBDjX7IUS";
+var GROQ_API_KEY    = window.GROQ_API_KEY    || '';
+var FREESOUND_TOKEN = window.FREESOUND_TOKEN || '';
 
 // ── PERSISTENCE ──
 function loadSettings(){
@@ -1760,7 +1763,7 @@ function addWorldClock(){
 function removeWorldClock(idx){ worldTZs.splice(idx,1); saveData('world_tzs',worldTZs); renderWorldClocks(); }
 
 // ── WEATHER (WeatherAPI.com) ──
-var WEATHER_API_KEY = 'd938db4675324176a9895602261807';
+var WEATHER_API_KEY = window.WEATHER_API_KEY || '';
 
 function loadWeather(){
   var statusEl=document.getElementById('weather-status');
@@ -2403,40 +2406,45 @@ async function syncFromSupabase() {
   }
 }
 
-// ── GROQ AI INTEGRATIONS (ultra-fast LLM) ──
+// ── GROQ AI INTEGRATIONS (ultra-fast LLM via secure Node backend) ──
 async function callGroq(systemPrompt, userPrompt) {
-  var response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + GROQ_API_KEY
-    },
-    body: JSON.stringify({
-      model: 'llama-3.3-70b-versatile',
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user',   content: userPrompt }
-      ],
-      temperature: 0.7,
-      max_tokens: 512
-    })
-  });
-
-  if (!response.ok) {
-    var errData = await response.json();
-    throw new Error(
-      (errData.error && errData.error.message) ||
-      'Groq API error: HTTP ' + response.status
-    );
+  var response;
+  try {
+    response = await fetch('http://localhost:3000/api/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        systemPrompt: systemPrompt,
+        userPrompt: userPrompt
+      })
+    });
+  } catch (netErr) {
+    throw new Error('Connection failed. Make sure the backend server is running (npm start). Details: ' + netErr.message);
   }
 
-  var data = await response.json();
-  var text = data.choices &&
-             data.choices[0] &&
-             data.choices[0].message &&
-             data.choices[0].message.content;
-  if (!text) throw new Error('Empty response from Groq');
-  return text.trim();
+  var text = await response.text();
+  if (!text) {
+    throw new Error('Empty response from backend server (HTTP ' + response.status + ')');
+  }
+
+  var data;
+  try {
+    data = JSON.parse(text);
+  } catch (parseErr) {
+    throw new Error('Server returned invalid content: ' + text.substring(0, 100));
+  }
+
+  if (!response.ok) {
+    throw new Error(data.error || 'Groq API error: HTTP ' + response.status);
+  }
+
+  if (!data.reply) {
+    throw new Error('No reply field in server response.');
+  }
+
+  return data.reply.trim();
 }
 
 async function generateAIBriefing() {
