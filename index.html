@@ -1354,11 +1354,11 @@ function triggerAlarm(a){
   dlg.showModal();
 
   // Wire up buttons directly — no delegation, no inline onclick
-  dlg.querySelector('#_asnooze').addEventListener('click',   function(){ snoozeAlarm(); });
-  dlg.querySelector('#_adismiss').addEventListener('click',  function(){ dismissAlarm(); });
-  dlg.querySelector('#_acomplete').addEventListener('click', function(){ completeAlarm(); });
-  dlg.querySelector('#_aspeak').addEventListener('click',    function(){ if(currentAlarm) speak('Time for: '+currentAlarm.title); });
-  dlg.querySelector('#_asilence').addEventListener('click',  function(){ stopAudio(); });
+  dlg.querySelector('#_asnooze').addEventListener('click',   function(e){ e.stopPropagation(); snoozeAlarm(); });
+  dlg.querySelector('#_adismiss').addEventListener('click',  function(e){ e.stopPropagation(); dismissAlarm(); });
+  dlg.querySelector('#_acomplete').addEventListener('click', function(e){ e.stopPropagation(); completeAlarm(); });
+  dlg.querySelector('#_aspeak').addEventListener('click',    function(e){ e.stopPropagation(); if(currentAlarm) speak('Time for: '+currentAlarm.title); });
+  dlg.querySelector('#_asilence').addEventListener('click',  function(e){ e.stopPropagation(); stopAudio(); });
 
   // Play sound & voice
   playSound(a.sound||'classic', settings.alarmVolume);
@@ -1386,6 +1386,7 @@ function dismissAlarm(){
     if(currentAlarm) logHistory(currentAlarm,'dismissed');
     stopRing();
     renderAll();
+    navigateTo('dashboard');
   }catch(e){ console.error('dismissAlarm error:',e); }
 }
 
@@ -1395,6 +1396,7 @@ function snoozeAlarm(){
     if(a) logHistory(a,'snoozed');
     stopRing();
     renderAll();
+    navigateTo('dashboard');
     // Toast notification
     var toast = document.createElement('div');
     toast.textContent = '💤 Snoozed! Rings again in 10 minutes.';
@@ -1419,6 +1421,7 @@ function completeAlarm(){
     stopRing();
     confetti();
     renderAll();
+    navigateTo('dashboard');
   }catch(e){ console.error('completeAlarm error:',e); }
 }
 
@@ -2418,9 +2421,16 @@ async function syncFromSupabase() {
 
 // ── GROQ AI INTEGRATIONS (ultra-fast LLM via secure Node backend) ──
 async function callGroq(systemPrompt, userPrompt) {
+  // Use relative /api/chat on Vercel/production; fallback to localhost for local dev
+  var isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  var isFileProtocol = window.location.protocol === 'file:';
+  var backendUrl = (isFileProtocol || (isLocalhost && window.location.port !== '3000'))
+    ? 'http://localhost:3000/api/chat'
+    : '/api/chat';
+
   var response;
   try {
-    response = await fetch('http://localhost:3000/api/chat', {
+    response = await fetch(backendUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
