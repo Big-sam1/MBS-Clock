@@ -11,5 +11,8 @@
     "dotenv": "^16.6.1",
     "express": "^4.22.2",
     "groq-sdk": "^0.3.3"
+  },
+  "devDependencies": {
+    "sharp": "^0.35.3"
   }
 }
