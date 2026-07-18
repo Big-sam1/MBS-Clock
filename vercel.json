@@ -1,7 +1,17 @@
 {
   "cleanUrls": true,
-  "rewrites": [
-    { "source": "/api/chat", "destination": "/api/chat.js" },
-    { "source": "/api/weather", "destination": "/api/weather.js" }
+  "routes": [
+    { "src": "/api/chat", "dest": "api/chat.js" },
+    { "src": "/api/weather", "dest": "api/weather.js" },
+    { "src": "/icon-192.png", "dest": "/icon-192.png" },
+    { "src": "/icon-512.png", "dest": "/icon-512.png" },
+    { "src": "/manifest.json", "dest": "/manifest.json" },
+    { "src": "/service-worker.js", "dest": "/service-worker.js" },
+    { "src": "/favi.png", "dest": "/favi.png" },
+    { "src": "/fav.png", "dest": "/fav.png" },
+    { "src": "/css/(.*)", "dest": "/css/$1" },
+    { "src": "/js/(.*)", "dest": "/js/$1" },
+    { "src": "/assets/(.*)", "dest": "/assets/$1" },
+    { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
