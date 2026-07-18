@@ -1,49 +1,34 @@
-/* Smart Alarm Pro - Service Worker for Offline Execution */
+/* MBS Smart Clock - Service Worker for PWA Offline Support */
 
-const CACHE_NAME = 'smart-alarm-pro-v1';
+const CACHE_NAME = 'mbs-clock-v1';
+
 const ASSETS_TO_CACHE = [
-  './',
-  './index.html',
-  './manifest.json',
-  './css/themes.css',
-  './css/main.css',
-  './css/components.css',
-  './css/responsive.css',
-  './js/app.js',
-  './js/utils/helpers.js',
-  './js/services/storage.js',
-  './js/services/alarmService.js',
-  './js/services/audioService.js',
-  './js/services/voiceService.js',
-  './js/services/weatherService.js',
-  './js/services/notificationService.js',
-  './js/services/pwaService.js',
-  './js/components/dashboard.js',
-  './js/components/clock.js',
-  './js/components/calendar.js',
-  './js/components/timer.js',
-  './js/components/analytics.js',
-  './js/components/settings.js'
+  '/',
+  '/index.html',
+  '/manifest.json',
+  '/favi.png',
+  '/fav.png',
+  '/service-worker.js'
 ];
 
-// Install Service Worker and cache all static resources
+// Install — pre-cache core assets
 self.addEventListener('install', (e) => {
   e.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('SW caching local static assets...');
+      console.log('[SW] Pre-caching core assets...');
       return cache.addAll(ASSETS_TO_CACHE);
     }).then(() => self.skipWaiting())
   );
 });
 
-// Activate event (clean up old caches)
+// Activate — remove old caches
 self.addEventListener('activate', (e) => {
   e.waitUntil(
     caches.keys().then((keys) => {
       return Promise.all(
         keys.map((key) => {
           if (key !== CACHE_NAME) {
-            console.log('SW cleaning outdated cache database:', key);
+            console.log('[SW] Removing old cache:', key);
             return caches.delete(key);
           }
         })
@@ -52,39 +37,44 @@ self.addEventListener('activate', (e) => {
   );
 });
 
-// Fetch event listener
+// Fetch — network first for API, cache first for static assets
 self.addEventListener('fetch', (e) => {
-  // Bypasses weather fetches or external assets to avoid caching errors
-  if (e.request.url.includes('api.open-meteo.com')) {
+  const url = new URL(e.request.url);
+
+  // Always bypass API routes — never cache live AI or weather data
+  if (url.pathname.startsWith('/api/')) {
     e.respondWith(fetch(e.request));
     return;
   }
 
+  // Bypass external resources (fonts, CDN, weather provider)
+  if (url.origin !== self.location.origin) {
+    e.respondWith(fetch(e.request));
+    return;
+  }
+
+  // Cache-first strategy for static assets
   e.respondWith(
-    caches.match(e.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        // Return cached asset immediately
-        return cachedResponse;
-      }
-      
-      // Fallback to fetch from network if missing
-      return fetch(e.request).then((networkResponse) => {
-        if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
-          return networkResponse;
+    caches.match(e.request).then((cached) => {
+      if (cached) return cached;
+
+      return fetch(e.request).then((response) => {
+        // Only cache successful same-origin responses
+        if (!response || response.status !== 200 || response.type !== 'basic') {
+          return response;
         }
 
-        // Cache newly fetched assets dynamically
-        const responseToCache = networkResponse.clone();
+        const toCache = response.clone();
         caches.open(CACHE_NAME).then((cache) => {
-          cache.put(e.request, responseToCache);
+          cache.put(e.request, toCache);
         });
 
-        return networkResponse;
+        return response;
       });
     }).catch(() => {
-      // Offline fallback for index page if network fails and cache is empty
+      // Offline fallback — serve index.html for navigation
       if (e.request.mode === 'navigate') {
-        return caches.match('./index.html');
+        return caches.match('/index.html');
       }
     })
   );
