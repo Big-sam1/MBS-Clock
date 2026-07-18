@@ -1,0 +1,2771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BMS Clock App</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0b0f19">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   SMART ALARM PRO — COMPLETE INLINE STYLES
+   ============================================================ */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#0b0f19;--bg2:#111827;--glass:rgba(255,255,255,0.04);--glass2:rgba(255,255,255,0.08);
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.15);
+  --text:#f8fafc;--text2:#94a3b8;--text3:#64748b;
+  --accent:#6366f1;--accentRgb:99,102,241;--accentGlow:rgba(99,102,241,.5);
+  --accent2:#38bdf8;--success:#10b981;--warn:#f59e0b;--danger:#ef4444;
+  --dangerGlow:rgba(239,68,68,.4);--successGlow:rgba(16,185,129,.4);
+  --shadow:0 8px 32px rgba(0,0,0,.4);--r:18px;--font:'Outfit',sans-serif;
+}
+body{font-family:var(--font);background:var(--bg);background-image:linear-gradient(135deg,#0f172a 0%,#1e1b4b 50%,#020617 100%);background-attachment:fixed;color:var(--text);min-height:100vh;display:flex;flex-direction:column;overflow-x:hidden}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:4px}
+
+/* ── LAYOUT ── */
+#app{display:flex;height:100vh;overflow:hidden}
+.sidebar{width:260px;background:rgba(10,15,30,.5);border-right:1px solid var(--border);backdrop-filter:blur(20px);display:flex;flex-direction:column;padding:1.5rem 1rem;flex-shrink:0;transition:transform .3s}
+.sidebar-logo{display:flex;align-items:center;gap:10px;margin-bottom:2rem;padding:0 .5rem}
+.logo-icon{width:44px;height:44px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;box-shadow:0 0 20px var(--accentGlow);animation:spinSlow 20s linear infinite}
+@keyframes spinSlow{to{transform:rotate(360deg)}}
+.logo-text{font-size:1.1rem;font-weight:800}
+.logo-sub{font-size:.65rem;color:var(--text2);margin-top:1px}
+.nav-links{display:flex;flex-direction:column;gap:4px;flex:1}
+.nav-item{display:flex;align-items:center;gap:12px;padding:.75rem 1rem;border-radius:12px;color:var(--text2);cursor:pointer;font-size:.88rem;font-weight:600;border:1px solid transparent;transition:all .25s;position:relative}
+.nav-item:hover{background:var(--glass2);color:var(--text)}
+.nav-item.active{background:var(--glass2);border-color:var(--border);color:var(--text)}
+.nav-item.active::before{content:'';position:absolute;left:0;top:25%;height:50%;width:3px;background:var(--accent);border-radius:0 3px 3px 0;box-shadow:0 0 8px var(--accentGlow)}
+.nav-icon{font-size:1.1rem;width:20px;text-align:center}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:60px;display:flex;align-items:center;justify-content:flex-end;padding:0 2rem;border-bottom:1px solid var(--border);flex-shrink:0;gap:12px;background:rgba(11,15,25,.3);backdrop-filter:blur(10px);position:relative;z-index:9000}
+.topbar-btn{width:38px;height:38px;border-radius:50%;background:var(--glass);border:1px solid var(--border);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem;transition:all .2s;position:relative}
+.topbar-btn:hover{background:var(--glass2);border-color:var(--accent)}
+.badge{position:absolute;top:-2px;right:-2px;background:var(--danger);color:#fff;font-size:.6rem;font-weight:700;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.content{flex:1;overflow-y:auto;padding:2rem}
+
+/* ── CARDS / GLASS ── */
+.glass-card{background:var(--glass);border:1px solid var(--border);border-radius:var(--r);padding:1.5rem;box-shadow:var(--shadow);backdrop-filter:blur(10px)}
+.glass-card:hover{border-color:var(--border2)}
+.card-title{font-size:1rem;font-weight:700;margin-bottom:1rem;color:var(--text)}
+
+/* ── PAGE TITLE ── */
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.75rem;flex-wrap:wrap;gap:1rem}
+.page-title{font-size:2rem;font-weight:800;letter-spacing:-1px;background:linear-gradient(135deg,var(--text) 50%,var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.page-sub{font-size:.85rem;color:var(--text2);margin-top:.25rem}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:.65rem 1.25rem;border-radius:10px;border:none;font-family:var(--font);font-size:.85rem;font-weight:600;cursor:pointer;transition:all .25s}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 4px 15px rgba(var(--accentRgb),.35)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(var(--accentRgb),.5)}
+.btn-secondary{background:var(--glass);border:1px solid var(--border);color:var(--text)}
+.btn-secondary:hover{background:var(--glass2);border-color:var(--border2)}
+.btn-danger{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:var(--danger)}
+.btn-sm{padding:.4rem .8rem;font-size:.78rem;border-radius:8px}
+.icon-btn{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.85rem;border:1px solid var(--border);background:var(--glass);color:var(--text);transition:all .2s}
+.icon-btn:hover{background:var(--glass2);border-color:var(--accent)}
+
+/* ── FORMS ── */
+.form-group{display:flex;flex-direction:column;gap:6px;margin-bottom:1rem}
+.form-group label{font-size:.8rem;font-weight:600;color:var(--text2)}
+.form-control{background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--font);font-size:.9rem;padding:.7rem 1rem;outline:none;transition:border-color .2s;width:100%}
+.form-control:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accentRgb),.1)}
+select.form-control{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;background-size:14px;padding-right:36px}
+.toggle-wrap{display:flex;align-items:center;justify-content:space-between;padding:.5rem 0}
+.toggle{position:relative;width:44px;height:24px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;inset:0;background:rgba(255,255,255,.1);border-radius:24px;cursor:pointer;transition:.3s;border:1px solid var(--border)}
+.toggle-slider::before{content:'';position:absolute;height:18px;width:18px;left:2px;bottom:2px;background:#fff;border-radius:50%;transition:.3s}
+.toggle input:checked + .toggle-slider{background:var(--accent);box-shadow:0 0 8px var(--accentGlow)}
+.toggle input:checked + .toggle-slider::before{transform:translateX(20px)}
+
+/* ── GRID SYSTEM ── */
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}
+.grid-auto{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.25rem}
+
+/* ── VIEWS ── */
+.view{display:none;animation:fadeIn .35s ease}
+.view.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── DASHBOARD SPECIFIC ── */
+.dash-grid{display:grid;grid-template-columns:2fr 1.2fr;gap:1.5rem}
+.time-panel{padding:2rem;background:linear-gradient(135deg,rgba(99,102,241,.12) 0%,rgba(56,189,248,.06) 100%);border:1px solid rgba(99,102,241,.25)}
+.big-time{font-size:4rem;font-weight:800;letter-spacing:-2px;line-height:1;font-variant-numeric:tabular-nums;text-shadow:0 0 30px rgba(99,102,241,.4)}
+.big-ampm{font-size:1.5rem;color:var(--accent2);margin-left:.5rem;font-weight:600}
+.big-date{font-size:1rem;color:var(--text2);margin-top:.5rem;font-weight:500}
+.big-greeting{font-size:1.5rem;font-weight:800;margin-bottom:.5rem}
+
+/* Analog clock */
+.analog-wrap{display:flex;justify-content:center;margin:1rem 0}
+.analog{width:180px;height:180px;border-radius:50%;background:var(--glass);border:3px solid var(--border);box-shadow:inset 0 4px 15px rgba(0,0,0,.4),var(--shadow),0 0 20px rgba(var(--accentRgb),.1);position:relative}
+.hand{position:absolute;bottom:50%;left:50%;transform-origin:bottom center;border-radius:4px}
+.hour-hand{width:5px;height:50px;background:var(--text);margin-left:-2.5px;border-radius:4px}
+.min-hand{width:3px;height:68px;background:var(--accent2);margin-left:-1.5px;border-radius:3px}
+.sec-hand{width:1.5px;height:78px;background:var(--accent);margin-left:-.75px;border-radius:2px;box-shadow:0 0 4px var(--accentGlow)}
+.center-dot{position:absolute;width:10px;height:10px;background:var(--accent);border:2px solid #fff;border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10;box-shadow:0 0 8px var(--accentGlow)}
+.clock-num{position:absolute;font-size:.8rem;font-weight:700;color:var(--text2);transform:translate(-50%,-50%)}
+.clock-num-12{top:10%;left:50%} .clock-num-3{top:50%;left:90%} .clock-num-6{top:90%;left:50%} .clock-num-9{top:50%;left:10%}
+
+/* Weather card */
+.weather-card{display:flex;align-items:center;gap:12px;padding:.85rem 1.25rem;border-radius:14px;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2);cursor:pointer;transition:all .3s}
+.weather-card:hover{background:rgba(56,189,248,.12)}
+.weather-temp{font-size:1.4rem;font-weight:800}
+.weather-desc{font-size:.75rem;color:var(--text2)}
+.weather-icon{font-size:2rem}
+
+/* Alarm countdown badge */
+.alarm-badge{background:rgba(var(--accentRgb),.08);border:1px solid rgba(var(--accentRgb),.25);border-radius:var(--r);padding:1.25rem}
+.alarm-time-big{font-size:2.25rem;font-weight:800;font-variant-numeric:tabular-nums}
+.countdown-pill{display:inline-block;background:rgba(var(--accentRgb),.15);color:var(--accent2);border-radius:20px;padding:.25rem .75rem;font-size:.8rem;font-weight:700;margin-top:.5rem}
+
+/* Task items */
+.task-item{display:flex;align-items:center;gap:12px;padding:.9rem 1rem;border-radius:12px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);margin-bottom:.6rem;transition:all .25s;cursor:pointer}
+.task-item:hover{background:rgba(255,255,255,.05);transform:translateX(4px)}
+.task-item.done .task-title-el{text-decoration:line-through;color:var(--text3)}
+.task-item.done{opacity:.7}
+.check-box{width:22px;height:22px;border-radius:6px;border:2px solid var(--border2);flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .25s}
+.check-box.checked{background:var(--success);border-color:var(--success);box-shadow:0 0 8px var(--successGlow)}
+.task-title-el{font-weight:600;font-size:.9rem}
+.task-meta-el{font-size:.75rem;color:var(--text3);margin-top:2px}
+.task-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+
+/* Priority / category badges */
+.badge-pill{padding:.2rem .6rem;border-radius:6px;font-size:.7rem;font-weight:700}
+.cat-work{background:rgba(59,130,246,.15);color:#60a5fa}
+.cat-school{background:rgba(139,92,246,.15);color:#a78bfa}
+.cat-study{background:rgba(236,72,153,.15);color:#f472b6}
+.cat-exercise{background:rgba(16,185,129,.15);color:#34d399}
+.cat-meeting{background:rgba(14,165,233,.15);color:#38bdf8}
+.cat-shopping{background:rgba(245,158,11,.15);color:#fbbf24}
+.cat-medicine{background:rgba(239,68,68,.15);color:#f87171}
+.cat-personal{background:rgba(100,116,139,.15);color:#94a3b8}
+.cat-birthday{background:rgba(219,39,119,.15);color:#f472b6}
+.cat-travel{background:rgba(20,184,166,.15);color:#2dd4bf}
+.pri-high{background:rgba(239,68,68,.15);color:var(--danger)}
+.pri-medium{background:rgba(245,158,11,.15);color:var(--warn)}
+.pri-low{background:rgba(16,185,129,.15);color:var(--success)}
+
+/* ── ALARM CARDS ── */
+.alarm-card{border-radius:var(--r);background:var(--glass);border:1px solid var(--border);padding:1.25rem;transition:all .3s;position:relative}
+.alarm-card:hover{border-color:var(--border2);transform:translateY(-2px)}
+.alarm-card.off{opacity:.55}
+.alarm-time{font-size:2.2rem;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-1px}
+.alarm-label{font-size:.9rem;font-weight:600;margin-top:.25rem}
+.alarm-repeat{font-size:.75rem;color:var(--text2)}
+
+/* ── CALENDAR ── */
+.cal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal-day-name{text-align:center;font-size:.7rem;font-weight:700;color:var(--text3);padding:.4rem 0}
+.cal-day{text-align:center;padding:.5rem;border-radius:8px;font-size:.82rem;cursor:pointer;transition:all .2s;position:relative;font-weight:500}
+.cal-day:hover{background:var(--glass2)}
+.cal-day.today{background:rgba(var(--accentRgb),.2);color:var(--text);font-weight:800;border:1px solid var(--accent)}
+.cal-day.selected{background:var(--accent);color:#fff;font-weight:700}
+.cal-day.other-month{color:var(--text3);opacity:.4}
+.cal-dot{width:4px;height:4px;border-radius:50%;position:absolute;bottom:3px;left:50%;transform:translateX(-50%)}
+
+/* ── TIMER ── */
+.timer-circle{width:240px;height:240px;position:relative;margin:0 auto 1.5rem}
+.timer-svg{width:100%;height:100%;transform:rotate(-90deg)}
+.timer-track{fill:none;stroke:rgba(255,255,255,.04);stroke-width:10}
+.timer-ring{fill:none;stroke:var(--accent);stroke-width:10;stroke-linecap:round;stroke-dasharray:691;stroke-dashoffset:0;transition:stroke-dashoffset .1s linear;filter:drop-shadow(0 0 6px var(--accentGlow))}
+.timer-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.timer-digits{font-size:2.8rem;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-1px}
+.timer-label-txt{font-size:.75rem;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+.timer-controls{display:flex;gap:12px;justify-content:center;margin-top:.5rem}
+.lap-item{display:flex;justify-content:space-between;font-size:.82rem;padding:.5rem 0;border-bottom:1px dashed rgba(255,255,255,.05);font-variant-numeric:tabular-nums}
+
+/* ── ANALYTICS ── */
+.stat-card{text-align:center;padding:1.5rem 1rem}
+.stat-num{font-size:2.5rem;font-weight:800;line-height:1}
+.stat-label{font-size:.78rem;color:var(--text2);font-weight:600;margin-top:.4rem;text-transform:uppercase;letter-spacing:.5px}
+.bar-wrap{display:flex;align-items:flex-end;gap:6px;height:120px;margin-top:1rem}
+.bar{flex:1;border-radius:4px 4px 0 0;background:linear-gradient(to top,var(--accent),var(--accent2));opacity:.8;transition:all .3s;min-height:4px;position:relative}
+.bar:hover{opacity:1}
+.bar-label{font-size:.65rem;color:var(--text3);text-align:center;margin-top:4px}
+.progress-bar{height:8px;border-radius:4px;background:rgba(255,255,255,.06);overflow:hidden;margin-top:.5rem}
+.progress-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .8s ease;box-shadow:0 0 8px var(--accentGlow)}
+.habit-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:.5rem}
+.habit-dot{width:100%;aspect-ratio:1;border-radius:6px;background:rgba(255,255,255,.05);border:1px dashed var(--border);cursor:pointer;transition:all .2s}
+.habit-dot.done{background:var(--success);border:none;box-shadow:0 0 6px var(--successGlow)}
+
+/* ── MODAL ── */
+.modal-bg{position:fixed;inset:0;background:rgba(5,7,18,.8);backdrop-filter:blur(12px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:1rem;opacity:0;visibility:hidden;transition:all .3s}
+.modal-bg.open{opacity:1;visibility:visible}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:24px;padding:2rem;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;transform:translateY(30px);transition:transform .35s cubic-bezier(.34,1.56,.64,1)}
+.modal-bg.open .modal{transform:translateY(0)}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--border)}
+.modal-title{font-size:1.4rem;font-weight:700}
+.modal-close{cursor:pointer;font-size:1.4rem;color:var(--text2);line-height:1}
+.modal-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border)}
+
+/* ── RING OVERLAY ── */
+#ring-overlay{position:fixed;inset:0;background:#020409;background-image:radial-gradient(circle at center,#111827 0%,#030712 100%);z-index:9999;display:none;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem}
+#ring-overlay.ringing{display:flex}
+.ring-pulse{width:220px;height:220px;position:relative;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.ring-pulse::before,.ring-pulse::after{content:'';position:absolute;border-radius:50%;border:2px solid rgba(var(--accentRgb),.3);animation:pulsate 2s infinite;pointer-events:none}
+.ring-pulse::after{animation-delay:.7s}
+@keyframes pulsate{0%{width:120px;height:120px;opacity:.8}100%{width:220px;height:220px;opacity:0}}
+.ring-inner{width:130px;height:130px;border-radius:50%;background:rgba(99,102,241,.12);border:2px solid var(--accent);display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 0 40px var(--accentGlow);animation:glowPulse 2s infinite;pointer-events:none}
+@keyframes glowPulse{0%,100%{box-shadow:0 0 20px var(--accentGlow)}50%{box-shadow:0 0 45px var(--accentGlow)}}
+.ring-clock-icon{font-size:2.5rem;animation:wobble .6s infinite}
+@keyframes wobble{0%,100%{transform:rotate(0)}25%{transform:rotate(-12deg)}75%{transform:rotate(12deg)}}
+.ring-title{font-size:2.2rem;font-weight:800;text-align:center}
+.ring-desc{color:var(--text2);text-align:center;max-width:400px}
+.ring-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.ring-btn{display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;font-size:.8rem;font-weight:600;color:var(--text2);background:none;border:none;font-family:var(--font);pointer-events:auto}
+.ring-btn .rb{width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4rem;border:1px solid var(--border);background:var(--glass);transition:all .3s}
+.ring-btn:hover .rb{transform:translateY(-4px)}
+.ring-btn.snooze .rb{background:var(--warn);border-color:transparent;box-shadow:0 4px 20px rgba(245,158,11,.4)}
+.ring-btn.dismiss .rb{background:var(--danger);border-color:transparent;box-shadow:0 4px 20px var(--dangerGlow)}
+.ring-btn.complete .rb{background:var(--success);border-color:transparent;box-shadow:0 4px 20px var(--successGlow)}
+.ring-links{display:flex;gap:20px;font-size:.8rem;color:var(--text2)}
+.ring-link{cursor:pointer;text-decoration:underline}
+
+/* ── ONBOARDING ── */
+#onboarding{position:fixed;inset:0;background:var(--bg);background-image:linear-gradient(135deg,#0f172a,#1e1b4b,#020617);z-index:8888;display:flex;align-items:center;justify-content:center;padding:1.5rem;transition:opacity .5s}
+#onboarding.done{opacity:0;pointer-events:none}
+.ob-card{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:24px;padding:2.5rem 2rem;width:100%;max-width:440px;display:flex;flex-direction:column;align-items:center;text-align:center;animation:scaleIn .4s cubic-bezier(.34,1.56,.64,1)}
+@keyframes scaleIn{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+.ob-logo{font-size:2.5rem;font-weight:800;background:linear-gradient(135deg,var(--text) 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.25rem}
+.ob-sub{font-size:.75rem;color:var(--accent2);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:2rem}
+.ob-slide{width:100%;min-height:130px;display:none;flex-direction:column;align-items:center;gap:.75rem}
+.ob-slide.active{display:flex}
+.ob-slide h3{font-size:1.4rem;font-weight:700}
+.ob-slide p{color:var(--text2);font-size:.9rem;line-height:1.6}
+.ob-slide .emoji{font-size:2.5rem}
+.ob-input{width:100%;padding:.85rem 1rem;border-radius:12px;background:rgba(0,0,0,.3);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:1rem;outline:none;text-align:center;margin-top:.5rem}
+.ob-input:focus{border-color:var(--accent)}
+.ob-dots{display:flex;gap:8px;margin:1.5rem 0}
+.ob-dot{width:8px;height:8px;border-radius:4px;background:var(--text3);transition:all .3s}
+.ob-dot.active{width:24px;background:var(--accent)}
+#ob-btn{width:100%;padding:.9rem;border-radius:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;font-family:var(--font);font-size:1rem;font-weight:700;cursor:pointer;transition:all .25s;box-shadow:0 4px 20px rgba(var(--accentRgb),.4)}
+#ob-btn:hover{transform:translateY(-2px);box-shadow:0 6px 25px rgba(var(--accentRgb),.55)}
+
+/* ── SETTINGS ── */
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:.75rem 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.setting-row:last-child{border-bottom:none}
+.setting-info strong{font-size:.9rem;display:block}
+.setting-info span{font-size:.75rem;color:var(--text2)}
+.theme-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin-top:.5rem}
+.theme-swatch{height:40px;border-radius:10px;cursor:pointer;border:2px solid transparent;transition:all .3s;position:relative}
+.theme-swatch.selected::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff}
+.theme-swatch:hover{transform:scale(1.05)}
+
+/* ── WEATHER API INFO BOX ── */
+.api-info-box{background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.2);border-radius:14px;padding:1.25rem;margin-bottom:1rem}
+.api-info-box h4{color:var(--accent2);font-size:.9rem;font-weight:700;margin-bottom:.5rem}
+.api-code{background:rgba(0,0,0,.4);border-radius:8px;padding:.75rem 1rem;font-size:.8rem;color:#a5f3fc;font-family:monospace;overflow-x:auto;white-space:pre;margin-top:.5rem}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .sidebar{position:fixed;left:-100%;top:0;height:100%;z-index:500;width:260px}
+  .sidebar.open{left:0}
+  #app{flex-direction:column}
+  .main{width:100%;height:100vh}
+  .content{padding:1.25rem}
+  .dash-grid{grid-template-columns:1fr}
+  .grid-2,.grid-3{grid-template-columns:1fr}
+  .big-time{font-size:2.8rem}
+  .ring-btns{grid-template-columns:repeat(3,1fr);gap:8px}
+  .ring-btn .rb{width:50px;height:50px}
+  .topbar{padding:0 1rem}
+}
+</style>
+<!-- Supabase CDN Client Library -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<!-- ONBOARDING -->
+<div id="onboarding">
+  <div class="ob-card">
+    <div class="ob-logo">⏰ Smart Alarm Pro</div>
+    <div class="ob-sub">Premium Bedside Companion</div>
+
+    <div class="ob-slide active" id="ob-s0">
+      <div class="emoji">👋</div>
+      <h3>Welcome!</h3>
+      <p>Enter your name so the voice assistant can greet you personally each morning.</p>
+      <input class="ob-input" id="ob-name" type="text" placeholder="Your first name (e.g. Samuel)" maxlength="30">
+    </div>
+    <div class="ob-slide" id="ob-s1">
+      <div class="emoji">🎵</div>
+      <h3>Offline Sound Synths</h3>
+      <p>Smart Alarm Pro generates all alarm sounds natively using the Web Audio API — no files to download, works 100% offline.</p>
+    </div>
+    <div class="ob-slide" id="ob-s2">
+      <div class="emoji">🌤️</div>
+      <h3>Live Weather & Real Clock</h3>
+      <p>Allow location access to get live weather via WeatherAPI.com — real conditions, feels-like temperature, UV index, and more. Your clock updates every second in real-time.</p>
+    </div>
+
+    <div class="ob-dots">
+      <span class="ob-dot active" id="d0"></span>
+      <span class="ob-dot" id="d1"></span>
+      <span class="ob-dot" id="d2"></span>
+    </div>
+    <button type="button" id="ob-btn">Continue</button>
+  </div>
+</div>
+
+<!-- ALARM RING OVERLAY — built dynamically by triggerAlarm() -->
+
+<!-- ALARM MODAL -->
+<div class="modal-bg" id="alarm-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="alarm-modal-title">Add Alarm</span>
+      <span class="modal-close" onclick="closeModal('alarm-modal')">✕</span>
+    </div>
+    <input type="hidden" id="alarm-edit-id">
+    <div class="grid-2">
+      <div class="form-group"><label>Time</label><input type="time" class="form-control" id="a-time"></div>
+      <div class="form-group"><label>Category</label>
+        <select class="form-control" id="a-cat">
+          <option>Personal</option><option>Work</option><option>School</option>
+          <option>Meeting</option><option>Exercise</option><option>Study</option>
+          <option>Shopping</option><option>Medicine</option><option>Travel</option><option>Birthday</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group"><label>Label / Title</label><input type="text" class="form-control" id="a-title" placeholder="e.g. Team Standup, Morning Run"></div>
+    <div class="form-group"><label>Notes</label><input type="text" class="form-control" id="a-desc" placeholder="Optional reminder notes"></div>
+    <div class="grid-2">
+      <div class="form-group"><label>Priority</label>
+        <select class="form-control" id="a-pri"><option>Low</option><option selected>Medium</option><option>High</option></select>
+      </div>
+      <div class="form-group"><label>Sound</label>
+        <select class="form-control" id="a-sound">
+          <option value="classic">Classic Bell</option>
+          <option value="digital">Digital Beep</option>
+          <option value="piano">Piano Chord</option>
+          <option value="birds">Birds Chirping</option>
+          <option value="ocean">Ocean Waves</option>
+          <option value="meditation">Meditation Binaural</option>
+          <option value="emergency">Emergency Siren</option>
+        </select>
+        <button class="btn btn-secondary btn-sm" style="margin-top:.4rem;width:100%;font-size:.78rem;padding:.4rem" onclick="openModal('freesound-modal')">🔍 Search Freesound.org</button>
+      </div>
+    </div>
+    <div class="form-group"><label>Repeat Schedule</label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px" id="repeat-days-wrap">
+        <label style="display:flex;align-items:center;gap:4px;font-size:.78rem;background:var(--glass);border:1px solid var(--border);padding:5px 10px;border-radius:8px;cursor:pointer"><input type="checkbox" value="0"> Mon</label>
+        <label style="display:flex;align-items:center;gap:4px;font-size:.78rem;background:var(--glass);border:1px solid var(--border);padding:5px 10px;border-radius:8px;cursor:pointer"><input type="checkbox" value="1"> Tue</label>
+        <label style="display:flex;align-items:center;gap:4px;font-size:.78rem;background:var(--glass);border:1px solid var(--border);padding:5px 10px;border-radius:8px;cursor:pointer"><input type="checkbox" value="2"> Wed</label>
+        <label style="display:flex;align-items:center;gap:4px;font-size:.78rem;background:var(--glass);border:1px solid var(--border);padding:5px 10px;border-radius:8px;cursor:pointer"><input type="checkbox" value="3"> Thu</label>
+        <label style="display:flex;align-items:center;gap:4px;font-size:.78rem;background:var(--glass);border:1px solid var(--border);padding:5px 10px;border-radius:8px;cursor:pointer"><input type="checkbox" value="4"> Fri</label>
+        <label style="display:flex;align-items:center;gap:4px;font-size:.78rem;background:var(--glass);border:1px solid var(--border);padding:5px 10px;border-radius:8px;cursor:pointer"><input type="checkbox" value="5"> Sat</label>
+        <label style="display:flex;align-items:center;gap:4px;font-size:.78rem;background:var(--glass);border:1px solid var(--border);padding:5px 10px;border-radius:8px;cursor:pointer"><input type="checkbox" value="6"> Sun</label>
+      </div>
+    </div>
+    <div class="toggle-wrap"><div><strong style="font-size:.9rem">Voice Reminder</strong><br><span style="font-size:.75rem;color:var(--text2)">Speak alarm title aloud</span></div><label class="toggle"><input type="checkbox" id="a-voice" checked><span class="toggle-slider"></span></label></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('alarm-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveAlarm()">Save Alarm</button>
+    </div>
+  </div>
+</div>
+
+<!-- TASK MODAL -->
+<div class="modal-bg" id="task-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="task-modal-title">Add Task</span>
+      <span class="modal-close" onclick="closeModal('task-modal')">✕</span>
+    </div>
+    <input type="hidden" id="task-edit-id">
+    <div class="form-group"><label>Task Title</label><input type="text" class="form-control" id="t-title" placeholder="e.g. Study JavaScript, Buy groceries"></div>
+    <div class="form-group"><label>Description</label><input type="text" class="form-control" id="t-desc" placeholder="Short notes about this task"></div>
+    <div class="grid-2">
+      <div class="form-group"><label>Due Date</label><input type="date" class="form-control" id="t-date"></div>
+      <div class="form-group"><label>Due Time</label><input type="time" class="form-control" id="t-time"></div>
+    </div>
+    <div class="grid-2">
+      <div class="form-group"><label>Priority</label>
+        <select class="form-control" id="t-pri"><option>Low</option><option selected>Medium</option><option>High</option></select>
+      </div>
+      <div class="form-group"><label>Category</label>
+        <select class="form-control" id="t-cat">
+          <option>Personal</option><option>Work</option><option>School</option>
+          <option>Meeting</option><option>Exercise</option><option>Study</option>
+          <option>Shopping</option><option>Medicine</option><option>Travel</option><option>Birthday</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('task-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveTask()">Save Task</button>
+    </div>
+  </div>
+</div>
+
+<!-- FREESOUND MODAL -->
+<div class="modal-bg" id="freesound-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Search Freesound.org 🎵</span>
+      <span class="modal-close" onclick="closeModal('freesound-modal')">✕</span>
+    </div>
+    <div class="form-group">
+      <label>Search Alarm & Ambient Sounds</label>
+      <div style="display:flex;gap:8px">
+        <input type="text" class="form-control" id="fs-search-input" placeholder="e.g. birds, zen, chime, chime bell">
+        <button class="btn btn-primary" onclick="searchFreesound()">Search</button>
+      </div>
+    </div>
+    <div id="fs-results-list" style="max-height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin-top:1rem">
+      <div style="color:var(--text3);font-size:.85rem;text-align:center;padding:1.5rem">Type keywords and press Search.</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('freesound-modal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+  <!-- SIDEBAR -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">⏰</div>
+      <div>
+        <div class="logo-text">Smart Alarm Pro</div>
+        <div class="logo-sub">Better Sleep. High Focus.</div>
+      </div>
+    </div>
+    <nav class="nav-links">
+      <div class="nav-item active" data-view="dashboard"><span class="nav-icon">🏠</span>Dashboard</div>
+      <div class="nav-item" data-view="clocks"><span class="nav-icon">🕐</span>World Clocks</div>
+      <div class="nav-item" data-view="alarms"><span class="nav-icon">🔔</span>Alarms</div>
+      <div class="nav-item" data-view="tasks"><span class="nav-icon">✅</span>Tasks & Planner</div>
+      <div class="nav-item" data-view="calendar"><span class="nav-icon">📅</span>Calendar</div>
+      <div class="nav-item" data-view="timer"><span class="nav-icon">⏱️</span>Stopwatch & Timer</div>
+      <div class="nav-item" data-view="analytics"><span class="nav-icon">📊</span>Analytics & Habits</div>
+      <div class="nav-item" data-view="settings"><span class="nav-icon">⚙️</span>Settings</div>
+    </nav>
+    <div style="margin-top:auto;padding-top:1rem;border-top:1px solid var(--border)">
+      <div style="font-size:.72rem;color:var(--text3);text-align:center">Smart Alarm Pro v1.0 · PWA Ready</div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+    <div class="topbar">
+      <span style="font-size:1.2rem;cursor:pointer;display:none" id="menu-toggle" onclick="toggleSidebar()">☰</span>
+      <div style="flex:1"></div>
+      <div id="weather-topbar" class="weather-card" onclick="navigateTo('settings')" style="display:none;padding:.5rem .85rem"></div>
+      <div class="topbar-btn" onclick="speak(getGreetingSpeech())">🔊</div>
+      <div class="topbar-btn" id="notif-btn" onclick="toggleNotifDrop()">
+        🔔<span class="badge" id="notif-badge" style="display:none">0</span>
+      </div>
+      <!-- Notif dropdown -->
+      <div id="notif-drop" style="display:none;position:absolute;top:66px;right:0;width:320px;background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:1rem;box-shadow:var(--shadow);z-index:9999;max-height:380px;overflow-y:auto">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem">
+          <strong style="font-size:.9rem">Alarm History</strong>
+          <span style="font-size:.75rem;color:var(--accent2);cursor:pointer" onclick="clearHistory()">Clear All</span>
+        </div>
+        <div id="notif-list"><div style="color:var(--text3);font-size:.85rem;text-align:center;padding:1rem">No history yet.</div></div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ===================== DASHBOARD ===================== -->
+      <div class="view active" id="view-dashboard">
+        <div class="dash-grid">
+          <div style="display:flex;flex-direction:column;gap:1.25rem">
+
+            <!-- TIME PANEL -->
+            <div class="glass-card time-panel">
+              <div id="dash-greeting" class="big-greeting">Good morning! 👋</div>
+              <div style="display:flex;align-items:baseline;gap:.5rem;flex-wrap:wrap">
+                <div id="dash-time" class="big-time">00:00:00</div>
+                <div id="dash-ampm" class="big-ampm">AM</div>
+              </div>
+              <div id="dash-date" class="big-date">Loading date…</div>
+            </div>
+
+            <!-- ANALOG CLOCK -->
+            <div class="glass-card" style="display:flex;flex-direction:column;align-items:center;padding:1.5rem">
+              <div class="card-title" style="margin-bottom:.5rem">Analog Clock</div>
+              <div class="analog-wrap">
+                <div class="analog" id="analog-clock">
+                  <div class="clock-num clock-num-12">12</div>
+                  <div class="clock-num clock-num-3">3</div>
+                  <div class="clock-num clock-num-6">6</div>
+                  <div class="clock-num clock-num-9">9</div>
+                  <div class="hand hour-hand" id="hour-hand"></div>
+                  <div class="hand min-hand" id="min-hand"></div>
+                  <div class="hand sec-hand" id="sec-hand"></div>
+                  <div class="center-dot"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- WEATHER CARD -->
+            <div class="glass-card" id="weather-panel">
+              <div class="card-title">🌤️ Live Weather</div>
+              <div id="weather-content">
+                <div style="color:var(--text3);font-size:.85rem">
+                  <p>Click to enable location and load real-time weather data.</p>
+                  <button class="btn btn-primary btn-sm" style="margin-top:.75rem" onclick="loadWeather()">📍 Enable Weather</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:1.25rem">
+
+            <!-- NEXT ALARM -->
+            <div class="alarm-badge glass-card">
+              <div style="font-size:.75rem;font-weight:700;color:var(--accent2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:.75rem">⏰ Next Alarm</div>
+              <div id="next-alarm-display">
+                <div style="color:var(--text3);font-size:.88rem">No alarms set. Add one in Alarms!</div>
+              </div>
+            </div>
+
+            <!-- TODAY'S TASKS -->
+            <div class="glass-card" style="flex:1">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+                <div class="card-title" style="margin:0">📋 Today's Tasks</div>
+                <button class="btn btn-primary btn-sm" onclick="openTaskModal()">+ Add</button>
+              </div>
+              <div id="dash-tasks-list">
+                <div style="color:var(--text3);font-size:.85rem;text-align:center;padding:2rem">No tasks for today. Add one!</div>
+              </div>
+            </div>
+
+            <!-- AI INTERACTIVE CO-PILOT -->
+            <div class="glass-card" style="background:linear-gradient(135deg,rgba(99,102,241,.08) 0%,rgba(217,70,239,.04) 100%);border:1px solid rgba(99,102,241,.2);display:flex;flex-direction:column;gap:.75rem">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div class="card-title" style="margin:0">✨ AI Bedside Assistant</div>
+                <div style="display:flex;gap:6px">
+                  <button class="btn btn-primary btn-sm" onclick="generateAIBriefing()" title="Generate Audio Briefing" style="padding:4px 10px;font-size:.78rem">🎙️ Briefing</button>
+                  <button class="btn btn-secondary btn-sm" onclick="clearAIChat()" style="padding:4px 8px" title="Clear Chat">🗑️</button>
+                </div>
+              </div>
+              
+              <!-- Chat Log Window -->
+              <div id="ai-chat-logs" style="height:150px;overflow-y:auto;font-size:.82rem;color:var(--text2);display:flex;flex-direction:column;gap:8px;padding:.5rem;background:rgba(0,0,0,.2);border-radius:10px;border:1px solid var(--border)">
+                <div style="color:var(--text3);font-style:italic;text-align:center;margin-top:2.5rem">Ask me anything by typing below or clicking the mic!</div>
+              </div>
+
+              <!-- Input Bar -->
+              <div style="display:flex;gap:6px;align-items:center">
+                <button class="btn btn-secondary" id="ai-mic-btn" onclick="toggleVoiceInput()" style="padding:.4rem .6rem;font-size:1rem;border-radius:10px;background:rgba(99,102,241,.15);border-color:rgba(99,102,241,.3);cursor:pointer;line-height:1" title="Voice Input">🎙️</button>
+                <input type="text" id="ai-chat-input" class="form-control" style="flex:1;font-size:.82rem;height:34px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid var(--border)" placeholder="Chat or say 'Add task gym at 6'..." onkeydown="if(event.key==='Enter') sendAIChatMessage()">
+                <button class="btn btn-primary btn-sm" onclick="sendAIChatMessage()" style="padding:.4rem .8rem;border-radius:10px;height:34px" title="Send Message">Send</button>
+              </div>
+            </div>
+
+            <!-- MOTIVATION QUOTE -->
+            <div class="glass-card" style="text-align:center;padding:1.25rem;background:rgba(99,102,241,.04)">
+              <div style="font-size:1.5rem;margin-bottom:.5rem">💡</div>
+              <div id="quote-text" style="font-style:italic;color:var(--text2);font-size:.88rem;line-height:1.6"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================== WORLD CLOCKS ===================== -->
+      <div class="view" id="view-clocks">
+        <div class="page-header">
+          <div><div class="page-title">World Clocks</div><div class="page-sub">Track multiple timezones at a glance</div></div>
+          <button class="btn btn-primary" onclick="addWorldClock()">+ Add Timezone</button>
+        </div>
+        <div id="world-clocks-grid" class="grid-2"></div>
+      </div>
+
+      <!-- ===================== ALARMS ===================== -->
+      <div class="view" id="view-alarms">
+        <div class="page-header">
+          <div><div class="page-title">Alarms & Reminders</div><div class="page-sub">Smart voice-enabled alarm schedules</div></div>
+          <button class="btn btn-primary" onclick="openAlarmModal()">+ Add Alarm</button>
+        </div>
+        <div id="alarms-grid" class="grid-auto"></div>
+      </div>
+
+      <!-- ===================== TASKS ===================== -->
+      <div class="view" id="view-tasks">
+        <div class="page-header">
+          <div><div class="page-title">Tasks & Planner</div><div class="page-sub">Organize goals and deadlines</div></div>
+          <div style="display:flex;gap:8px">
+            <select id="task-filter" class="form-control" style="width:130px;padding:.5rem .75rem;font-size:.82rem" onchange="renderTasks()">
+              <option value="all">All Tasks</option>
+              <option value="today">Today</option>
+              <option value="pending">Pending</option>
+              <option value="completed">Completed</option>
+              <option value="high">High Priority</option>
+            </select>
+            <button class="btn btn-primary" onclick="openTaskModal()">+ Add Task</button>
+          </div>
+        </div>
+        <div class="glass-card"><div id="tasks-list"></div></div>
+      </div>
+
+      <!-- ===================== CALENDAR ===================== -->
+      <div class="view" id="view-calendar">
+        <div class="page-header">
+          <div><div class="page-title">Calendar & Events</div><div class="page-sub">Visualize tasks and alarm schedules</div></div>
+          <button class="btn btn-secondary" onclick="calToday()">Today</button>
+        </div>
+        <div class="grid-2" style="align-items:start">
+          <div class="glass-card">
+            <div class="cal-header">
+              <button class="icon-btn" onclick="calNav(-1)">‹</button>
+              <span id="cal-month-label" style="font-weight:700;font-size:1.1rem"></span>
+              <button class="icon-btn" onclick="calNav(1)">›</button>
+            </div>
+            <div class="cal-grid" id="cal-day-names"></div>
+            <div class="cal-grid" id="cal-days-grid" style="margin-top:4px"></div>
+          </div>
+          <div class="glass-card">
+            <div class="card-title" id="cal-agenda-title">Agenda</div>
+            <div id="cal-agenda-content" style="display:flex;flex-direction:column;gap:.75rem"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================== TIMER ===================== -->
+      <div class="view" id="view-timer">
+        <div class="page-header">
+          <div><div class="page-title">Stopwatch & Timer</div><div class="page-sub">Track activities and focus sessions</div></div>
+          <div style="display:flex;background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:4px;gap:4px">
+            <button class="btn btn-sm" id="tab-sw" onclick="switchTimerTab('sw')" style="background:var(--accent);color:#fff">Stopwatch</button>
+            <button class="btn btn-sm btn-secondary" id="tab-cd" onclick="switchTimerTab('cd')">Countdown</button>
+            <button class="btn btn-sm btn-secondary" id="tab-pm" onclick="switchTimerTab('pm')">Pomodoro</button>
+          </div>
+        </div>
+        <div class="grid-2" style="align-items:start">
+          <div class="glass-card" style="display:flex;flex-direction:column;align-items:center;padding:2rem">
+            <!-- Stopwatch -->
+            <div id="panel-sw">
+              <div class="timer-circle">
+                <svg class="timer-svg" viewBox="0 0 240 240">
+                  <circle class="timer-track" cx="120" cy="120" r="110"/>
+                  <circle class="timer-ring" id="sw-ring" cx="120" cy="120" r="110"/>
+                </svg>
+                <div class="timer-text">
+                  <div class="timer-digits" id="sw-digits">00:00<span style="font-size:1.5rem;color:var(--text2)">.00</span></div>
+                  <div class="timer-label-txt">Stopwatch</div>
+                </div>
+              </div>
+              <div class="timer-controls">
+                <button class="btn btn-primary" id="sw-start-btn" onclick="swStartStop()">▶ Start</button>
+                <button class="btn btn-secondary" id="sw-lap-btn" onclick="swLapReset()">Reset</button>
+              </div>
+            </div>
+
+            <!-- Countdown -->
+            <div id="panel-cd" style="display:none">
+              <div class="timer-circle">
+                <svg class="timer-svg" viewBox="0 0 240 240">
+                  <circle class="timer-track" cx="120" cy="120" r="110"/>
+                  <circle class="timer-ring" id="cd-ring" cx="120" cy="120" r="110"/>
+                </svg>
+                <div class="timer-text">
+                  <div class="timer-digits" id="cd-digits">00:00:00</div>
+                  <div class="timer-label-txt">Countdown</div>
+                </div>
+              </div>
+              <div class="timer-controls" style="flex-direction:column;gap:.75rem;width:100%">
+                <div style="display:flex;gap:8px;justify-content:center">
+                  <div style="text-align:center"><label style="font-size:.7rem;color:var(--text2)">HH</label><br>
+                    <select class="form-control" id="cd-h" style="width:70px;text-align:center"><?php for($i=0;$i<24;$i++) echo "<option>".str_pad($i,2,'0',STR_PAD_LEFT)."</option>"; ?></select></div>
+                  <div style="text-align:center"><label style="font-size:.7rem;color:var(--text2)">MM</label><br>
+                    <select class="form-control" id="cd-m" style="width:70px;text-align:center"></select></div>
+                  <div style="text-align:center"><label style="font-size:.7rem;color:var(--text2)">SS</label><br>
+                    <select class="form-control" id="cd-s" style="width:70px;text-align:center"></select></div>
+                </div>
+                <div style="display:flex;gap:8px;justify-content:center">
+                  <button class="btn btn-primary" id="cd-start-btn" onclick="cdStartStop()">▶ Start</button>
+                  <button class="btn btn-secondary" onclick="cdReset()">Reset</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Pomodoro -->
+            <div id="panel-pm" style="display:none">
+              <div style="display:flex;gap:8px;justify-content:center;margin-bottom:1.25rem">
+                <button class="btn btn-sm" id="pm-focus-btn" onclick="setPomo('focus')" style="background:var(--accent);color:#fff">25m Focus</button>
+                <button class="btn btn-sm btn-secondary" id="pm-short-btn" onclick="setPomo('short')">5m Break</button>
+                <button class="btn btn-sm btn-secondary" id="pm-long-btn" onclick="setPomo('long')">15m Break</button>
+              </div>
+              <div class="timer-circle">
+                <svg class="timer-svg" viewBox="0 0 240 240">
+                  <circle class="timer-track" cx="120" cy="120" r="110"/>
+                  <circle class="timer-ring" id="pm-ring" cx="120" cy="120" r="110" style="stroke:var(--success)"/>
+                </svg>
+                <div class="timer-text">
+                  <div class="timer-digits" id="pm-digits">25:00</div>
+                  <div class="timer-label-txt" id="pm-mode-label">Focus Session</div>
+                </div>
+              </div>
+              <div class="timer-controls">
+                <button class="btn btn-primary" id="pm-start-btn" onclick="pmStartStop()">▶ Start Focus</button>
+                <button class="btn btn-secondary" onclick="pmReset()">Reset</button>
+              </div>
+              <div class="form-group" style="margin-top:1rem;width:100%">
+                <label>Ambient Sound</label>
+                <select class="form-control" id="pm-sound" onchange="if(pmRunning)playAmbient(this.value)">
+                  <option value="none">None</option>
+                  <option value="ocean">Ocean Waves</option>
+                  <option value="rain">Gentle Rain</option>
+                  <option value="meditation">Binaural Beats</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lap list -->
+          <div class="glass-card">
+            <div class="card-title" id="timer-right-title">Laps & Records</div>
+            <div id="timer-right-content">
+              <div style="color:var(--text3);font-size:.85rem;text-align:center;padding:2rem">Start the stopwatch and tap Lap to record splits.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================== ANALYTICS ===================== -->
+      <div class="view" id="view-analytics">
+        <div class="page-header">
+          <div><div class="page-title">Analytics & Habits</div><div class="page-sub">Track productivity trends and streaks</div></div>
+        </div>
+        <div class="grid-3" style="margin-bottom:1.25rem">
+          <div class="glass-card stat-card"><div class="stat-num" id="stat-total" style="color:var(--accent2)">0</div><div class="stat-label">Total Tasks</div></div>
+          <div class="glass-card stat-card"><div class="stat-num" id="stat-done" style="color:var(--success)">0</div><div class="stat-label">Completed</div></div>
+          <div class="glass-card stat-card"><div class="stat-num" id="stat-rate" style="color:var(--warn)">0%</div><div class="stat-label">Success Rate</div></div>
+        </div>
+        <div class="grid-2">
+          <div class="glass-card">
+            <div class="card-title">Weekly Task Completions</div>
+            <div id="weekly-chart" style="display:flex;flex-direction:column"></div>
+          </div>
+          <div class="glass-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+              <div class="card-title" style="margin:0">🔥 Habit Tracker</div>
+              <button class="btn btn-primary btn-sm" onclick="addHabit()">+ Habit</button>
+            </div>
+            <div id="habits-list"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================== SETTINGS ===================== -->
+      <div class="view" id="view-settings">
+        <div class="page-header">
+          <div><div class="page-title">Settings</div><div class="page-sub">Customize appearance, audio, and integrations</div></div>
+        </div>
+        <div class="grid-2" style="align-items:start">
+          <div style="display:flex;flex-direction:column;gap:1.25rem">
+            <!-- Clock & Format -->
+            <div class="glass-card">
+              <div class="card-title">🕐 Clock & Display</div>
+              <div class="setting-row">
+                <div class="setting-info"><strong>24-Hour Format</strong><span>Toggle AM/PM vs 24h display</span></div>
+                <label class="toggle"><input type="checkbox" id="set-24h" onchange="saveSetting('clockFormat24',this.checked);renderDashboard()"><span class="toggle-slider"></span></label>
+              </div>
+              <div class="setting-row">
+                <div class="setting-info"><strong>Show Seconds</strong><span>Display seconds in digital clock</span></div>
+                <label class="toggle"><input type="checkbox" id="set-secs" checked onchange="saveSetting('showSeconds',this.checked)"><span class="toggle-slider"></span></label>
+              </div>
+              <div class="setting-row">
+                <div class="setting-info"><strong>Your Name</strong><span>Shown in greeting and voice alerts</span></div>
+                <input type="text" id="set-name" class="form-control" style="width:140px" placeholder="Your name" oninput="saveSetting('userName',this.value);renderDashboard()">
+              </div>
+            </div>
+            <!-- Audio -->
+            <div class="glass-card">
+              <div class="card-title">🔊 Audio & Voice</div>
+              <div class="form-group">
+                <label>Alarm Volume</label>
+                <input type="range" id="set-alarm-vol" min="0" max="1" step=".05" value=".8" style="accent-color:var(--accent);width:100%" oninput="saveSetting('alarmVolume',+this.value);document.getElementById('avol-lbl').textContent=Math.round(this.value*100)+'%'">
+                <span id="avol-lbl" style="font-size:.8rem;color:var(--text2)">80%</span>
+              </div>
+              <div class="form-group">
+                <label>Voice (Speech Synthesis)</label>
+                <select class="form-control" id="set-voice" onchange="saveSetting('voiceName',this.value)"><option value="">Default</option></select>
+              </div>
+              <button class="btn btn-secondary btn-sm" onclick="testVoice()">🔊 Test Voice</button>
+            </div>
+            <!-- Backup -->
+            <div class="glass-card">
+              <div class="card-title">💾 Backup & Restore</div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <button class="btn btn-secondary btn-sm" onclick="exportBackup()">⬇ Export JSON</button>
+                <button class="btn btn-secondary btn-sm" onclick="document.getElementById('import-file').click()">⬆ Import JSON</button>
+                <input type="file" id="import-file" accept=".json" style="display:none" onchange="importBackup(this)">
+              </div>
+            </div>
+
+            <!-- Supabase Cloud Sync -->
+            <div class="glass-card">
+              <div class="card-title">☁️ Supabase Cloud Database</div>
+              <div style="font-size:.8rem;color:var(--text2);line-height:1.5;margin-bottom:1rem">
+                Sync your alarms, tasks, and habits to Supabase automatically! Set up a table named <code style="color:var(--accent2);background:rgba(0,0,0,.2);padding:2px 6px;border-radius:4px">user_backups</code>:
+              </div>
+              <div class="api-code" style="margin-bottom:1rem;font-size:.7rem;padding:.5rem">CREATE TABLE user_backups (
+  id TEXT PRIMARY KEY,
+  payload JSONB,
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);</div>
+              <div class="setting-row">
+                <div class="setting-info"><strong>Auto-Sync</strong><span>Save changes to cloud automatically</span></div>
+                <label class="toggle"><input type="checkbox" id="set-sb-autosync" onchange="saveSetting('supabaseAutoSync',this.checked)"><span class="toggle-slider"></span></label>
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:.75rem">
+                <button class="btn btn-primary btn-sm" onclick="syncToSupabase()">⬆ Backup to Cloud</button>
+                <button class="btn btn-secondary btn-sm" onclick="syncFromSupabase()">⬇ Restore from Cloud</button>
+              </div>
+              <div id="supabase-status" style="margin-top:.75rem;font-size:.8rem;color:var(--text2)">Status: Disconnected</div>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:1.25rem">
+            <!-- Theme -->
+            <div class="glass-card">
+              <div class="card-title">🎨 Themes</div>
+              <div class="theme-grid" id="theme-grid">
+                <div class="theme-swatch selected" data-theme="default" style="background:linear-gradient(135deg,#6366f1,#38bdf8)" title="Blue Slate"></div>
+                <div class="theme-swatch" data-theme="purple" style="background:linear-gradient(135deg,#d946ef,#a855f7)" title="Royal Purple"></div>
+                <div class="theme-swatch" data-theme="green" style="background:linear-gradient(135deg,#10b981,#6ee7b7)" title="Emerald"></div>
+                <div class="theme-swatch" data-theme="orange" style="background:linear-gradient(135deg,#ea580c,#fbbf24)" title="Sunset"></div>
+                <div class="theme-swatch" data-theme="pink" style="background:linear-gradient(135deg,#db2777,#fda4af)" title="Rose"></div>
+                <div class="theme-swatch" data-theme="cyberpunk" style="background:linear-gradient(135deg,#ff007f,#00f2fe)" title="Cyberpunk"></div>
+                <div class="theme-swatch" data-theme="black" style="background:#000;border:1px solid #333" title="AMOLED Black"></div>
+                <div class="theme-swatch" data-theme="light" style="background:linear-gradient(135deg,#f1f5f9,#dde4ee)" title="Minimal Light"></div>
+              </div>
+            </div>
+
+            <!-- Weather API Info -->
+            <div class="glass-card">
+              <div class="card-title">🌍 Weather Integration</div>
+              <div class="api-info-box">
+                <h4>WeatherAPI.com (Your API Key Integrated ✅)</h4>
+                <p style="font-size:.8rem;color:var(--text2);line-height:1.5">This app uses <strong style="color:var(--accent2)">WeatherAPI.com</strong> for rich real-time weather: temperature, feels-like, condition icon, humidity, wind, UV index, and city name.</p>
+                <div class="api-code">GET https://api.weatherapi.com/v1/current.json
+  ?key=d938db...1807
+  &q={latitude},{longitude}
+  &aqi=no
+
+Returns: temp_c, feelslike_c,
+  condition.text, condition.icon,
+  humidity, wind_kph, uv, location.name</div>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:.5rem">
+                <button class="btn btn-primary btn-sm" onclick="loadWeather()">📍 Load via GPS</button>
+                <button class="btn btn-secondary btn-sm" onclick="loadWeatherByCity()">🏙️ Search City</button>
+              </div>
+              <div id="weather-status" style="margin-top:.75rem;font-size:.8rem;color:var(--text2)"></div>
+            </div>
+
+            <!-- Notifications -->
+            <div class="glass-card">
+              <div class="card-title">🔔 Notifications</div>
+              <div class="setting-row">
+                <div class="setting-info"><strong>Desktop Notifications</strong><span>Alert even when tab is hidden</span></div>
+                <button class="btn btn-primary btn-sm" onclick="requestNotifPermission()">Enable</button>
+              </div>
+              <div id="notif-status" style="font-size:.8rem;color:var(--text2);margin-top:.5rem"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<script>
+/* ============================================================
+   SMART ALARM PRO — COMPLETE SELF-CONTAINED JAVASCRIPT
+   No ES6 modules, works from file:// and http:// equally
+   ============================================================ */
+
+// ── STATE ──
+var settings = loadSettings();
+var alarms   = loadData('alarms');
+var tasks    = loadData('tasks');
+var habits   = loadData('habits');
+var history  = loadData('alarm_history');
+var worldTZs = loadData('world_tzs');
+if (!worldTZs.length) worldTZs = [
+  {name:'London',tz:'Europe/London'},
+  {name:'New York',tz:'America/New_York'},
+  {name:'Tokyo',tz:'Asia/Tokyo'}
+];
+
+var audioCtx = null;
+var activeNodes = [];
+var currentAlarm = null;
+var swRunning = false, swTime = 0, swStart = 0, swInterval = null, swLaps = [];
+var cdRunning = false, cdTotal = 0, cdRemain = 0, cdInterval = null;
+var pmRunning = false, pmMode = 'focus', pmRemain = 25*60, pmInterval = null, pomoCycles = 0;
+var calDate = new Date();
+var calSelected = new Date();
+var weatherData = null;
+var activeTimerTab = 'sw';
+
+// ── API CREDENTIALS ──
+var SUPABASE_URL = "https://aqyibkafjvpsyrlernun.supabase.co";
+var SUPABASE_ANON_KEY = "sb_publishable_sUTb4wvyUeQc7qTtRo_8TA_MI7ZlWso";
+var supabase = null;
+if (window.supabase) {
+  try {
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  } catch (e) {
+    console.error("Supabase failed to initialize:", e);
+  }
+}
+
+const GROQ_API_KEY = "";
+var FREESOUND_TOKEN = "b69b7e3V5UAstcpzB6LMSmif12V6OruDBDjX7IUS";
+
+// ── PERSISTENCE ──
+function loadSettings(){
+  try{ return Object.assign({
+    userName:'', clockFormat24:false, showSeconds:true,
+    alarmVolume:.8, voiceName:'', theme:'default', onboarded:false,
+    supabaseAutoSync:false, customSounds:[]
+  }, JSON.parse(localStorage.getItem('sap_settings')||'{}')); }
+  catch(e){ return {userName:'',clockFormat24:false,showSeconds:true,alarmVolume:.8,voiceName:'',theme:'default',onboarded:false,supabaseAutoSync:false,customSounds:[]}; }
+}
+function saveSettings(){
+  localStorage.setItem('sap_settings', JSON.stringify(settings));
+  if (settings.supabaseAutoSync) {
+    try { syncToSupabase(true); } catch(e) { console.warn('Auto-sync error:', e); }
+  }
+}
+function saveSetting(k,v){ settings[k]=v; saveSettings(); }
+function loadData(k){ try{ return JSON.parse(localStorage.getItem('sap_'+k)||'[]'); }catch(e){ return []; } }
+function saveData(k,d){
+  localStorage.setItem('sap_'+k, JSON.stringify(d));
+  if (['alarms', 'tasks', 'habits', 'world_tzs'].indexOf(k) > -1) {
+    if (settings.supabaseAutoSync) {
+      syncToSupabase(true);
+    }
+  }
+}
+
+// ── ONBOARDING ──
+function initOnboarding(){
+  var onboardingEl = document.getElementById('onboarding');
+  if (!onboardingEl) {
+    boot();
+    return;
+  }
+
+  if (settings.onboarded) {
+    onboardingEl.style.display = 'none';
+    boot();
+    return;
+  }
+
+  var slide = 0;
+  var slides = [document.getElementById('ob-s0'), document.getElementById('ob-s1'), document.getElementById('ob-s2')];
+  var dots = [document.getElementById('d0'), document.getElementById('d1'), document.getElementById('d2')];
+  var btn = document.getElementById('ob-btn');
+  var nameInput = document.getElementById('ob-name');
+
+  if (!btn || slides.some(function(s){ return !s; }) || dots.some(function(d){ return !d; })) {
+    if (typeof boot === 'function') boot();
+    return;
+  }
+
+  btn.type = 'button';
+
+  function goSlide(i) {
+    slides.forEach(function(s, idx){
+      if (s) s.classList.toggle('active', idx === i);
+    });
+    dots.forEach(function(d, idx){
+      if (d) d.classList.toggle('active', idx === i);
+    });
+    btn.textContent = (i === slides.length - 1) ? 'Start Application' : 'Continue →';
+    slide = i;
+  }
+
+  btn.addEventListener('click', function(event) {
+    event.preventDefault();
+    if (slide === 0) {
+      var n = (nameInput && nameInput.value || '').trim();
+      settings.userName = n || 'Champion';
+      saveSettings();
+    }
+
+    if (slide < slides.length - 1) {
+      goSlide(slide + 1);
+      return;
+    }
+
+    settings.onboarded = true;
+    saveSettings();
+    onboardingEl.style.opacity = '0';
+    setTimeout(function() {
+      onboardingEl.style.display = 'none';
+    }, 500);
+    if (typeof boot === 'function') boot();
+  });
+
+  goSlide(0);
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initOnboarding);
+} else {
+  initOnboarding();
+}
+
+// ── BOOT ──
+function boot(){
+  applyTheme(settings.theme);
+  seedDefaults();
+  startClock();
+  startAlarmChecker();
+  renderAll();
+  loadVoices();
+  applySettingsUI();
+  if(settings.weatherEnabled){ loadWeather(); }
+
+  // Responsive
+  if(window.innerWidth <= 768){
+    document.getElementById('menu-toggle').style.display = 'block';
+  }
+  window.addEventListener('resize', function(){
+    document.getElementById('menu-toggle').style.display = window.innerWidth<=768 ? 'block' : 'none';
+  });
+
+  // Build countdown dropdowns
+  var mSel = document.getElementById('cd-m'), sSel = document.getElementById('cd-s');
+  for(var i=0;i<60;i++){
+    var o1=document.createElement('option'); o1.value=i; o1.textContent=String(i).padStart(2,'0'); mSel.appendChild(o1);
+    var o2=document.createElement('option'); o2.value=i; o2.textContent=String(i).padStart(2,'0'); sSel.appendChild(o2);
+  }
+  // Build hours dropdown  
+  var hSel = document.getElementById('cd-h'); hSel.innerHTML='';
+  for(var i=0;i<24;i++){
+    var o=document.createElement('option'); o.value=i; o.textContent=String(i).padStart(2,'0'); hSel.appendChild(o);
+  }
+
+  renderCalendar();
+}
+
+// ── SEED DEFAULTS ──
+function seedDefaults(){
+  if(alarms.length) return;
+  var today = todayStr();
+  alarms = [
+    {id:uid(),title:'Morning Workout',desc:'Stretch and jog 30 mins',time:'06:30',category:'Exercise',priority:'High',sound:'birds',voice:true,active:true,repeat:[0,1,2,3,4,5,6]},
+    {id:uid(),title:'Team Standup',desc:'Review sprint board',time:'09:00',category:'Work',priority:'Medium',sound:'piano',voice:true,active:true,repeat:[0,1,2,3,4]},
+    {id:uid(),title:'Read Atomic Habits',desc:'20 pages every evening',time:'20:00',category:'Personal',priority:'Low',sound:'meditation',voice:true,active:true,repeat:[0,1,2,3,4,5,6]}
+  ];
+  saveData('alarms', alarms);
+  tasks = [
+    {id:uid(),title:'Study JavaScript ES6+',desc:'Promises, async/await, modules',date:today,time:'09:30',priority:'High',category:'Study',done:false},
+    {id:uid(),title:'Team Meeting Prep',desc:'Slide deck and roadmap',date:today,time:'10:00',priority:'Medium',category:'Work',done:false},
+    {id:uid(),title:'Gym Cardio',desc:'30 min treadmill',date:today,time:'17:30',priority:'Medium',category:'Exercise',done:false},
+    {id:uid(),title:'Hydrate 3L Water',desc:'Stay hydrated all day',date:today,time:'',priority:'Low',category:'Personal',done:true}
+  ];
+  saveData('tasks', tasks);
+  habits = [
+    {id:uid(),name:'Drink Water 💧',history:[today]},
+    {id:uid(),name:'Read 20 mins 📚',history:[]},
+    {id:uid(),name:'Daily Workout 🏋️',history:[]}
+  ];
+  saveData('habits', habits);
+}
+
+// ── ROUTING ──
+function navigateTo(view){
+  document.querySelectorAll('.nav-item').forEach(function(el){ el.classList.toggle('active', el.getAttribute('data-view')===view); });
+  document.querySelectorAll('.view').forEach(function(el){ el.classList.toggle('active', el.id==='view-'+view); });
+  if(view==='alarms') renderAlarms();
+  if(view==='tasks') renderTasks();
+  if(view==='calendar') renderCalendar();
+  if(view==='analytics') renderAnalytics();
+  if(view==='clocks') renderWorldClocks();
+  if(view==='dashboard') renderDashboard();
+  if(window.innerWidth<=768) document.getElementById('sidebar').classList.remove('open');
+}
+document.querySelectorAll('.nav-item').forEach(function(el){
+  el.addEventListener('click', function(){ navigateTo(el.getAttribute('data-view')); });
+});
+function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); }
+
+function renderAll(){
+  renderDashboard();
+  renderAlarms();
+  renderTasks();
+  renderCalendar();
+  renderAnalytics();
+  renderWorldClocks();
+}
+
+// ── REAL-TIME CLOCK ──
+function startClock(){
+  function tick(){
+    var now = new Date();
+    var h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
+    // Digital
+    var use24 = settings.clockFormat24;
+    var ampm = h>=12?'PM':'AM';
+    var dh = use24 ? h : (h%12||12);
+    var showSec = settings.showSeconds;
+    var timeStr = pad(dh)+':'+pad(m) + (showSec?':'+pad(s):'');
+    var el = document.getElementById('dash-time');
+    var amEl = document.getElementById('dash-ampm');
+    if(el) el.textContent = timeStr;
+    if(amEl) amEl.textContent = use24 ? '' : ampm;
+    // Date
+    var dateEl = document.getElementById('dash-date');
+    if(dateEl){
+      var days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+      var months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+      dateEl.textContent = days[now.getDay()]+', '+now.getDate()+' '+months[now.getMonth()]+' '+now.getFullYear();
+    }
+    // Analog hands
+    var hrDeg = (h%12)*30 + m*0.5;
+    var minDeg = m*6 + s*0.1;
+    var secDeg = s*6 + now.getMilliseconds()*0.006;
+    var hh = document.getElementById('hour-hand');
+    var mh = document.getElementById('min-hand');
+    var sh = document.getElementById('sec-hand');
+    if(hh) hh.style.transform='rotate('+hrDeg+'deg)';
+    if(mh) mh.style.transform='rotate('+minDeg+'deg)';
+    if(sh) sh.style.transform='rotate('+secDeg+'deg)';
+    // World clocks update
+    updateWorldClockTimes();
+    // Countdown badge update
+    updateNextAlarmCountdown();
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+function pad(n){ return String(n).padStart(2,'0'); }
+function todayStr(){ return new Date().toISOString().split('T')[0]; }
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2); }
+
+// ── DASHBOARD ──
+function renderDashboard(){
+  // Greeting
+  var h = new Date().getHours();
+  var g = h<12?'Good morning':h<18?'Good afternoon':'Good evening';
+  if(h<12) g='Good morning'; else if(h<18) g='Good afternoon'; else g='Good evening';
+  var name = settings.userName || 'Champion';
+  var greetEl = document.getElementById('dash-greeting');
+  if(greetEl) greetEl.textContent = g+', '+name+' 👋';
+  // Quote
+  var quotes = [
+    'Focus on being productive, not busy.',
+    'Your future is created by what you do today.',
+    'Small daily improvements lead to stunning results.',
+    'Discipline is the bridge between goals and achievement.',
+    'Rise up, start fresh, see the bright opportunity in each new day.',
+    'Make each day your masterpiece.'
+  ];
+  var qEl = document.getElementById('quote-text');
+  if(qEl) qEl.textContent = '"'+quotes[new Date().getDate()%quotes.length]+'"';
+  // Next alarm
+  renderNextAlarm();
+  // Today tasks
+  renderDashTasks();
+}
+
+function renderNextAlarm(){
+  var el = document.getElementById('next-alarm-display');
+  if(!el) return;
+  var next = getNextAlarm();
+  if(!next){ el.innerHTML='<div style="color:var(--text3);font-size:.88rem">No alarms scheduled. Add one!</div>'; return; }
+  var parts = next.alarm.time.split(':');
+  var h=+parts[0], m=+parts[1];
+  var use24 = settings.clockFormat24;
+  var ampm = h>=12?'PM':'AM';
+  var dh = use24?h:(h%12||12);
+  el.innerHTML='<div class="alarm-time-big">'+pad(dh)+':'+pad(m)+(use24?'':' <span style="font-size:1rem">'+ampm+'</span>')+'</div>'+
+    '<div style="font-weight:600;color:var(--text2);margin-top:.25rem">'+next.alarm.title+'</div>'+
+    '<div class="countdown-pill" id="alarm-countdown-el">calculating…</div>';
+}
+
+function updateNextAlarmCountdown(){
+  var el = document.getElementById('alarm-countdown-el');
+  if(!el) return;
+  var next = getNextAlarm();
+  if(!next){ el.textContent='No active alarms'; return; }
+  var now = new Date();
+  var diff = next.triggerTime - now;
+  if(diff<0){ diff=0; }
+  var dh = Math.floor(diff/3600000);
+  var dm = Math.floor((diff%3600000)/60000);
+  var ds = Math.floor((diff%60000)/1000);
+  el.textContent = dh>0 ? 'In '+dh+'h '+dm+'m' : dm>0 ? 'In '+dm+'m '+ds+'s' : 'In '+ds+'s';
+}
+
+function getNextAlarm(){
+  var now = new Date();
+  var best = null, bestDiff = Infinity;
+  alarms.forEach(function(a){
+    if(!a.active) return;
+    var parts=a.time.split(':'); var ah=+parts[0],am=+parts[1];
+    // Find next occurrence
+    for(var d=0;d<=7;d++){
+      var candidate = new Date(now.getFullYear(),now.getMonth(),now.getDate()+d,ah,am,0,0);
+      if(candidate<=now) continue;
+      var dayIdx=(candidate.getDay()+6)%7;
+      if(!a.repeat||a.repeat.length===0||a.repeat.indexOf(dayIdx)>-1){
+        var diff=candidate-now;
+        if(diff<bestDiff){ bestDiff=diff; best={alarm:a,triggerTime:candidate}; }
+        break;
+      }
+    }
+  });
+  return best;
+}
+
+function renderDashTasks(){
+  var el = document.getElementById('dash-tasks-list');
+  if(!el) return;
+  var today = todayStr();
+  var todayTasks = tasks.filter(function(t){ return t.date===today; }).slice(0,5);
+  if(!todayTasks.length){ el.innerHTML='<div style="color:var(--text3);font-size:.85rem;text-align:center;padding:1.5rem">No tasks for today. <span style="color:var(--accent);cursor:pointer" onclick="navigateTo(\'tasks\')">Add one!</span></div>'; return; }
+  el.innerHTML = todayTasks.map(function(t){ return taskItemHTML(t, true); }).join('');
+  el.querySelectorAll('.check-box').forEach(function(cb){
+    cb.addEventListener('click', function(){ toggleTask(cb.getAttribute('data-id')); renderDashboard(); });
+  });
+}
+
+function taskItemHTML(t, compact){
+  var catClass = 'cat-'+(t.category||'personal').toLowerCase();
+  var priClass = 'pri-'+(t.priority||'medium').toLowerCase();
+  return '<div class="task-item '+(t.done?'done':'')+'" data-id="'+t.id+'">'+
+    '<div class="check-box '+(t.done?'checked':'')+'" data-id="'+t.id+'" onclick="toggleTask(\''+t.id+'\');renderAll()">'+
+      (t.done?'<span style="color:#fff;font-size:.75rem">✓</span>':'')+'</div>'+
+    '<div style="flex:1;min-width:0">'+
+      '<div class="task-title-el">'+escHtml(t.title)+'</div>'+
+      (t.desc&&!compact?'<div class="task-meta-el" style="white-space:pre-line">'+escHtml(t.desc)+'</div>':'')+ 
+      (t.date?'<div class="task-meta-el">📅 '+t.date+(t.time?' @ '+t.time:'')+'</div>':'')+'</div>'+
+    '<div class="task-right">'+
+      '<span class="badge-pill '+catClass+'">'+t.category+'</span>'+
+      '<span class="badge-pill '+priClass+'">'+t.priority+'</span>'+
+      (!compact?'<span class="icon-btn" style="background:rgba(99,102,241,.15);border-color:rgba(99,102,241,.3)" onclick="generateAISubtasks(\''+t.id+'\')" title="AI Substeps">✨</span>'+
+       '<span class="icon-btn" onclick="editTask(\''+t.id+'\')" title="Edit">✏️</span>'+
+       '<span class="icon-btn btn-danger" onclick="deleteTask(\''+t.id+'\')" title="Delete">🗑</span>':'')+'</div></div>';
+}
+
+// ── ALARM CHECKER (runs every second) ──
+function startAlarmChecker(){
+  setInterval(function(){
+    var now = new Date();
+    if(now.getSeconds()!==0) return;
+    var hStr=pad(now.getHours()), mStr=pad(now.getMinutes());
+    var timeNow=hStr+':'+mStr;
+    var dayIdx=(now.getDay()+6)%7;
+    alarms.forEach(function(a){
+      if(!a.active||currentAlarm) return;
+      if(a.time!==timeNow) return;
+      if(a.repeat&&a.repeat.length>0&&a.repeat.indexOf(dayIdx)===-1) return;
+      triggerAlarm(a);
+    });
+  },1000);
+}
+
+function triggerAlarm(a){
+  // Remove any existing alarm dialog
+  var old = document.getElementById('_alarm_dialog');
+  if(old) old.parentNode.removeChild(old);
+
+  currentAlarm = a;
+
+  // Build native <dialog> — browser places this in its own TOP LAYER
+  // above ALL z-index, CSS stacking contexts, and overlays
+  var dlg = document.createElement('dialog');
+  dlg.id = '_alarm_dialog';
+  dlg.style.cssText = [
+    'border:none',
+    'padding:0',
+    'background:#020409',
+    'border-radius:0',
+    'width:100vw',
+    'height:100vh',
+    'max-width:100vw',
+    'max-height:100vh',
+    'display:flex',
+    'flex-direction:column',
+    'align-items:center',
+    'justify-content:center',
+    'gap:1.5rem',
+    'font-family:system-ui,sans-serif',
+    'color:#fff',
+    'overflow:hidden'
+  ].join(';');
+
+  dlg.innerHTML = [
+    '<div style="text-align:center">',
+      '<div style="font-size:4rem;margin-bottom:.5rem">⏰</div>',
+      '<div style="font-size:1rem;font-weight:700;opacity:.7">'+escHtml(a.time||'')+'</div>',
+    '</div>',
+    '<div style="font-size:2.2rem;font-weight:800;text-align:center;padding:0 2rem">'+escHtml(a.title||'Alarm')+'</div>',
+    '<div style="color:rgba(255,255,255,.55);text-align:center;max-width:380px;padding:0 1.5rem;font-size:.95rem">'+escHtml(a.desc||'Time to act!')+'</div>',
+    '<div style="display:flex;gap:28px;margin-top:1rem">',
+      '<button id="_asnooze" style="',
+        'display:flex;flex-direction:column;align-items:center;gap:10px;',
+        'cursor:pointer;background:none;border:none;color:#fff;',
+        'font-size:.9rem;font-weight:700;padding:.5rem 1rem;border-radius:12px',
+      '">',
+        '<span style="width:70px;height:70px;border-radius:50%;background:#f59e0b;display:flex;align-items:center;justify-content:center;font-size:1.8rem;box-shadow:0 4px 24px rgba(245,158,11,.6)">💤</span>',
+        'Snooze 10m',
+      '</button>',
+      '<button id="_adismiss" style="',
+        'display:flex;flex-direction:column;align-items:center;gap:10px;',
+        'cursor:pointer;background:none;border:none;color:#fff;',
+        'font-size:.9rem;font-weight:700;padding:.5rem 1rem;border-radius:12px',
+      '">',
+        '<span style="width:70px;height:70px;border-radius:50%;background:#ef4444;display:flex;align-items:center;justify-content:center;font-size:1.8rem;box-shadow:0 4px 24px rgba(239,68,68,.6)">✕</span>',
+        'Dismiss',
+      '</button>',
+      '<button id="_acomplete" style="',
+        'display:flex;flex-direction:column;align-items:center;gap:10px;',
+        'cursor:pointer;background:none;border:none;color:#fff;',
+        'font-size:.9rem;font-weight:700;padding:.5rem 1rem;border-radius:12px',
+      '">',
+        '<span style="width:70px;height:70px;border-radius:50%;background:#10b981;display:flex;align-items:center;justify-content:center;font-size:1.8rem;box-shadow:0 4px 24px rgba(16,185,129,.6)">✓</span>',
+        'Complete',
+      '</button>',
+    '</div>',
+    '<div style="display:flex;gap:2rem;margin-top:.5rem">',
+      '<button id="_aspeak" style="background:none;border:none;color:rgba(255,255,255,.45);cursor:pointer;font-size:.82rem;text-decoration:underline">🔊 Speak again</button>',
+      '<button id="_asilence" style="background:none;border:none;color:rgba(255,255,255,.45);cursor:pointer;font-size:.82rem;text-decoration:underline">🔇 Silence</button>',
+    '</div>'
+  ].join('');
+
+  document.body.appendChild(dlg);
+
+  // showModal() puts dialog in browser top layer — nothing can sit above it
+  dlg.showModal();
+
+  // Wire up buttons directly — no delegation, no inline onclick
+  dlg.querySelector('#_asnooze').addEventListener('click',   function(){ snoozeAlarm(); });
+  dlg.querySelector('#_adismiss').addEventListener('click',  function(){ dismissAlarm(); });
+  dlg.querySelector('#_acomplete').addEventListener('click', function(){ completeAlarm(); });
+  dlg.querySelector('#_aspeak').addEventListener('click',    function(){ if(currentAlarm) speak('Time for: '+currentAlarm.title); });
+  dlg.querySelector('#_asilence').addEventListener('click',  function(){ stopAudio(); });
+
+  // Play sound & voice
+  playSound(a.sound||'classic', settings.alarmVolume);
+  if(a.voice) setTimeout(function(){ speak('Attention '+(settings.userName||'')+'! It is '+a.time+'. Time for: '+a.title); }, 1200);
+  if('vibrate' in navigator) navigator.vibrate([500,300,500,300,500]);
+  sendNotification('\u23f0 Alarm: '+a.title, a.desc||'');
+}
+
+function stopRing(){
+  try{
+    var dlg = document.getElementById('_alarm_dialog');
+    if(dlg){
+      try{ dlg.close(); }catch(e){}
+      dlg.parentNode.removeChild(dlg);
+    }
+    stopAudio();
+    if(window.speechSynthesis) window.speechSynthesis.cancel();
+    currentAlarm = null;
+    updateNotifBadge();
+  }catch(e){ console.error('stopRing error:',e); }
+}
+
+function dismissAlarm(){
+  try{
+    if(currentAlarm) logHistory(currentAlarm,'dismissed');
+    stopRing();
+    renderAll();
+  }catch(e){ console.error('dismissAlarm error:',e); }
+}
+
+function snoozeAlarm(){
+  try{
+    var a = currentAlarm;
+    if(a) logHistory(a,'snoozed');
+    stopRing();
+    renderAll();
+    // Toast notification
+    var toast = document.createElement('div');
+    toast.textContent = '💤 Snoozed! Rings again in 10 minutes.';
+    toast.style.cssText = 'position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:#f59e0b;color:#000;font-weight:700;padding:.75rem 1.5rem;border-radius:50px;z-index:9999999;font-size:.9rem;box-shadow:0 4px 24px rgba(0,0,0,.5);white-space:nowrap';
+    document.body.appendChild(toast);
+    setTimeout(function(){ if(toast.parentNode) toast.parentNode.removeChild(toast); }, 4000);
+    // Re-trigger after 10 minutes
+    if(a) setTimeout(function(){ triggerAlarm(a); }, 10*60*1000);
+  }catch(e){ console.error('snoozeAlarm error:',e); }
+}
+
+function completeAlarm(){
+  try{
+    if(currentAlarm){
+      var title = (currentAlarm.title||'').trim().toLowerCase();
+      tasks.forEach(function(t){
+        if(t.title && t.title.trim().toLowerCase()===title) t.done=true;
+      });
+      saveData('tasks',tasks);
+      logHistory(currentAlarm,'completed');
+    }
+    stopRing();
+    confetti();
+    renderAll();
+  }catch(e){ console.error('completeAlarm error:',e); }
+}
+
+function speakAgain(){
+  if(currentAlarm) speak('Time for: '+currentAlarm.title+'. '+(currentAlarm.desc||''));
+}
+function stopMusic(){ stopAudio(); }
+
+function logHistory(a,action){
+  if(!a) return;
+  history.unshift({id:uid(),title:a.title,time:a.time,action:action,ts:Date.now()});
+  if(history.length>50) history.pop();
+  saveData('alarm_history',history);
+  updateNotifBadge();
+}
+
+// ── ALARMS VIEW ──
+function renderAlarms(){
+  var el = document.getElementById('alarms-grid');
+  if(!el) return;
+  if(!alarms.length){ el.innerHTML='<div class="glass-card" style="grid-column:span 2;text-align:center;padding:4rem;color:var(--text3)">⏰<br><br>No alarms yet. Click <strong>+ Add Alarm</strong> to create your first!</div>'; return; }
+  var days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  el.innerHTML = alarms.map(function(a){
+    var repeatStr='Once';
+    if(a.repeat&&a.repeat.length===7) repeatStr='Daily';
+    else if(a.repeat&&a.repeat.length===5&&a.repeat.indexOf(5)===-1&&a.repeat.indexOf(6)===-1) repeatStr='Weekdays';
+    else if(a.repeat&&a.repeat.length) repeatStr=a.repeat.map(function(d){return days[d];}).join(', ');
+    var use24=settings.clockFormat24, parts=a.time.split(':'), ah=+parts[0];
+    var ampm=ah>=12?'PM':'AM', dh=use24?ah:(ah%12||12);
+    return '<div class="alarm-card '+(a.active?'':'off')+'">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start">'+
+        '<div>'+
+          '<div class="alarm-time">'+pad(dh)+':'+parts[1]+(use24?'':' <span style="font-size:1rem">'+ampm+'</span>')+'</div>'+
+          '<div class="alarm-label">'+escHtml(a.title||'Alarm')+'</div>'+
+          '<div class="alarm-repeat">🔁 '+repeatStr+' &nbsp;🎵 '+a.sound+'</div>'+
+        '</div>'+
+        '<label class="toggle" style="margin-top:.25rem"><input type="checkbox" '+(a.active?'checked':'')+' onchange="toggleAlarm(\''+a.id+'\',this.checked)"><span class="toggle-slider"></span></label>'+
+      '</div>'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:.75rem;border-top:1px dashed rgba(255,255,255,.05);padding-top:.75rem">'+
+        '<span class="badge-pill cat-'+a.category.toLowerCase()+'">'+a.category+'</span>'+
+        '<div style="display:flex;gap:6px">'+
+          '<span class="icon-btn" onclick="previewSound(\''+a.sound+'\')" title="Preview">▶</span>'+
+          '<span class="icon-btn" onclick="editAlarm(\''+a.id+'\')" title="Edit">✏️</span>'+
+          '<span class="icon-btn btn-danger" onclick="deleteAlarm(\''+a.id+'\')" title="Delete">🗑</span>'+
+        '</div>'+
+      '</div></div>';
+  }).join('');
+}
+
+function toggleAlarm(id,v){ var a=alarms.find(function(x){return x.id===id;}); if(a){a.active=v;saveData('alarms',alarms);} }
+function deleteAlarm(id){ if(!confirm('Delete this alarm?')) return; alarms=alarms.filter(function(a){return a.id!==id;}); saveData('alarms',alarms); renderAlarms(); renderDashboard(); }
+
+function openAlarmModal(alarm){
+  document.getElementById('alarm-modal-title').textContent = alarm?'Edit Alarm':'Add Alarm';
+  document.getElementById('alarm-edit-id').value = alarm?alarm.id:'';
+  document.getElementById('a-time').value = alarm?alarm.time:'';
+  document.getElementById('a-title').value = alarm?alarm.title:'';
+  document.getElementById('a-desc').value = alarm?alarm.desc:'';
+  document.getElementById('a-cat').value = alarm?alarm.category:'Personal';
+  document.getElementById('a-pri').value = alarm?alarm.priority:'Medium';
+
+  // Populate Sound select with defaults + custom Freesound audio options
+  var selectEl = document.getElementById('a-sound');
+  var defaultOptions = [
+    { value: 'classic', text: 'Classic Bell' },
+    { value: 'digital', text: 'Digital Beep' },
+    { value: 'piano', text: 'Piano Chord' },
+    { value: 'birds', text: 'Birds Chirping' },
+    { value: 'ocean', text: 'Ocean Waves' },
+    { value: 'meditation', text: 'Meditation Binaural' },
+    { value: 'emergency', text: 'Emergency Siren' }
+  ];
+  
+  var customSounds = settings.customSounds || [];
+  var allOptions = defaultOptions.concat(customSounds.map(function(s) {
+    return { value: s.url, text: '🔊 ' + s.name.slice(0, 22) + '...' };
+  }));
+  
+  if (alarm && alarm.sound && !allOptions.some(function(o){ return o.value === alarm.sound; })) {
+    allOptions.push({ value: alarm.sound, text: '🔊 Custom audio' });
+  }
+  
+  selectEl.innerHTML = allOptions.map(function(o) {
+    return '<option value="' + escAttr(o.value) + '">' + escHtml(o.text) + '</option>';
+  }).join('');
+
+  selectEl.value = alarm ? alarm.sound : 'classic';
+  document.getElementById('a-voice').checked = alarm?alarm.voice:true;
+  document.querySelectorAll('#repeat-days-wrap input').forEach(function(cb){
+    cb.checked = alarm&&alarm.repeat ? alarm.repeat.indexOf(+cb.value)>-1 : false;
+  });
+  openModal('alarm-modal');
+}
+function editAlarm(id){ openAlarmModal(alarms.find(function(a){return a.id===id;})); }
+
+function saveAlarm(){
+  var id = document.getElementById('alarm-edit-id').value;
+  var repeat=[];
+  document.querySelectorAll('#repeat-days-wrap input:checked').forEach(function(cb){ repeat.push(+cb.value); });
+  var alarm={
+    id:id||uid(), title:document.getElementById('a-title').value||'Alarm',
+    desc:document.getElementById('a-desc').value,
+    time:document.getElementById('a-time').value,
+    category:document.getElementById('a-cat').value,
+    priority:document.getElementById('a-pri').value,
+    sound:document.getElementById('a-sound').value,
+    voice:document.getElementById('a-voice').checked,
+    active:true, repeat:repeat
+  };
+  if(!alarm.time){ alert('Please set a time!'); return; }
+  if(id){ alarms=alarms.map(function(a){return a.id===id?alarm:a;}); }
+  else{ alarms.push(alarm); }
+  saveData('alarms',alarms);
+  closeModal('alarm-modal');
+  renderAlarms();
+  renderDashboard();
+}
+
+function previewSound(s){
+  playSound(s,settings.alarmVolume);
+  setTimeout(stopAudio,3500);
+}
+
+// ── TASKS VIEW ──
+function renderTasks(){
+  var el = document.getElementById('tasks-list');
+  if(!el) return;
+  var filter = (document.getElementById('task-filter')||{}).value||'all';
+  var today = todayStr();
+  var filtered = tasks.filter(function(t){
+    if(filter==='today') return t.date===today;
+    if(filter==='pending') return !t.done;
+    if(filter==='completed') return t.done;
+    if(filter==='high') return t.priority==='High';
+    return true;
+  });
+  filtered.sort(function(a,b){ var pw={High:3,Medium:2,Low:1}; return (a.done-b.done)||((pw[b.priority]||0)-(pw[a.priority]||0)); });
+  if(!filtered.length){ el.innerHTML='<div style="text-align:center;padding:3rem;color:var(--text3)">📋<br><br>No tasks match this filter.</div>'; return; }
+  el.innerHTML = filtered.map(function(t){ return taskItemHTML(t, false); }).join('');
+  el.querySelectorAll('.check-box').forEach(function(cb){
+    cb.addEventListener('click', function(){ toggleTask(cb.getAttribute('data-id')); renderTasks(); renderDashboard(); renderAnalytics(); });
+  });
+}
+
+function toggleTask(id){ var t=tasks.find(function(x){return x.id===id;}); if(t){ t.done=!t.done; saveData('tasks',tasks); } }
+function deleteTask(id){ if(!confirm('Delete this task?')) return; tasks=tasks.filter(function(t){return t.id!==id;}); saveData('tasks',tasks); renderAll(); }
+function openTaskModal(task){
+  document.getElementById('task-modal-title').textContent = task?'Edit Task':'Add Task';
+  document.getElementById('task-edit-id').value = task?task.id:'';
+  document.getElementById('t-title').value = task?task.title:'';
+  document.getElementById('t-desc').value = task?task.desc:'';
+  document.getElementById('t-date').value = task?task.date:todayStr();
+  document.getElementById('t-time').value = task?task.time:'';
+  document.getElementById('t-pri').value = task?task.priority:'Medium';
+  document.getElementById('t-cat').value = task?task.category:'Personal';
+  openModal('task-modal');
+}
+function editTask(id){ openTaskModal(tasks.find(function(t){return t.id===id;})); }
+function saveTask(){
+  var id = document.getElementById('task-edit-id').value;
+  var task={
+    id:id||uid(), title:document.getElementById('t-title').value,
+    desc:document.getElementById('t-desc').value,
+    date:document.getElementById('t-date').value,
+    time:document.getElementById('t-time').value,
+    priority:document.getElementById('t-pri').value,
+    category:document.getElementById('t-cat').value,
+    done:false
+  };
+  if(!task.title){ alert('Task title required!'); return; }
+  if(id){ task.done=(tasks.find(function(t){return t.id===id;})||{}).done||false; tasks=tasks.map(function(t){return t.id===id?task:t;}); }
+  else{ tasks.push(task); }
+  saveData('tasks',tasks);
+  closeModal('task-modal');
+  renderAll();
+}
+
+// ── CALENDAR ──
+var calDayNames=['MON','TUE','WED','THU','FRI','SAT','SUN'];
+function renderCalendar(){
+  var el=document.getElementById('cal-days-grid'); if(!el) return;
+  var dn=document.getElementById('cal-day-names');
+  if(dn&&!dn.children.length){ calDayNames.forEach(function(d){ var s=document.createElement('div'); s.className='cal-day-name'; s.textContent=d; dn.appendChild(s); }); }
+
+  var y=calDate.getFullYear(), m=calDate.getMonth();
+  var months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var lbl=document.getElementById('cal-month-label'); if(lbl) lbl.textContent=months[m]+' '+y;
+  var firstDay=(new Date(y,m,1).getDay()+6)%7;
+  var daysInMonth=new Date(y,m+1,0).getDate();
+  var prevDays=new Date(y,m,0).getDate();
+  var today=new Date(); var todayD=today.getDate(),todayM=today.getMonth(),todayY=today.getFullYear();
+  
+  el.innerHTML='';
+  var total=42;
+  for(var i=0;i<total;i++){
+    var d=i-firstDay+1;
+    var div=document.createElement('div');
+    div.className='cal-day';
+    if(d<1){ div.textContent=prevDays+d; div.classList.add('other-month'); }
+    else if(d>daysInMonth){ div.textContent=d-daysInMonth; div.classList.add('other-month'); }
+    else{
+      div.textContent=d;
+      var thisDate=new Date(y,m,d);
+      if(d===todayD&&m===todayM&&y===todayY) div.classList.add('today');
+      if(d===calSelected.getDate()&&m===calSelected.getMonth()&&y===calSelected.getFullYear()) div.classList.add('selected');
+      // Dots
+      var ds=y+'-'+pad(m+1)+'-'+pad(d);
+      var hasTasks=tasks.some(function(t){return t.date===ds;});
+      var dayOfWeek=(thisDate.getDay()+6)%7;
+      var hasAlarms=alarms.some(function(a){return a.active&&a.repeat&&a.repeat.indexOf(dayOfWeek)>-1;});
+      if(hasTasks){var dot=document.createElement('span');dot.className='cal-dot';dot.style.background='var(--success)';div.appendChild(dot);}
+      else if(hasAlarms){var dot=document.createElement('span');dot.className='cal-dot';dot.style.background='var(--accent2)';div.appendChild(dot);}
+      (function(dateStr,dd,dm,dy){
+        div.addEventListener('click',function(){
+          calSelected=new Date(dy,dm,dd);
+          renderCalendar();
+          renderCalAgenda(dateStr);
+        });
+      })(ds,d,m,y);
+    }
+    el.appendChild(div);
+  }
+  renderCalAgenda(calSelected.toISOString().split('T')[0]);
+}
+function renderCalAgenda(dateStr){
+  var el=document.getElementById('cal-agenda-content'); if(!el) return;
+  var titleEl=document.getElementById('cal-agenda-title');
+  if(titleEl) titleEl.textContent='Agenda — '+dateStr;
+  var items=[];
+  tasks.forEach(function(t){ if(t.date===dateStr) items.push({type:'task',label:t.title,time:t.time,cat:t.category}); });
+  var dayOfWeek=(new Date(dateStr).getDay()+6)%7;
+  alarms.forEach(function(a){ if(a.active&&a.repeat&&a.repeat.indexOf(dayOfWeek)>-1) items.push({type:'alarm',label:a.title,time:a.time,cat:a.category}); });
+  items.sort(function(a,b){ return (a.time||'').localeCompare(b.time||''); });
+  if(!items.length){ el.innerHTML='<div style="color:var(--text3);font-size:.85rem;text-align:center;padding:2rem">Nothing scheduled.</div>'; return; }
+  el.innerHTML=items.map(function(it){
+    var icon=it.type==='alarm'?'🔔':'📋';
+    var borderColor=it.type==='alarm'?'var(--accent2)':'var(--success)';
+    return '<div style="padding:.75rem 1rem;border-radius:12px;background:var(--glass);border-left:3px solid '+borderColor+';display:flex;justify-content:space-between;align-items:center">'+
+      '<div>'+icon+' <strong>'+escHtml(it.label)+'</strong><div style="font-size:.75rem;color:var(--text2);margin-top:2px">'+it.cat+'</div></div>'+
+      '<span style="font-size:.88rem;font-weight:700;font-variant-numeric:tabular-nums">'+it.time+'</span></div>';
+  }).join('');
+}
+function calNav(dir){ calDate.setMonth(calDate.getMonth()+dir); renderCalendar(); }
+function calToday(){ calDate=new Date(); calSelected=new Date(); renderCalendar(); }
+
+// ── ANALYTICS ──
+function renderAnalytics(){
+  var total=tasks.length, done=tasks.filter(function(t){return t.done;}).length;
+  var rate=total?Math.round(done/total*100):0;
+  var s1=document.getElementById('stat-total'), s2=document.getElementById('stat-done'), s3=document.getElementById('stat-rate');
+  if(s1) s1.textContent=total; if(s2) s2.textContent=done; if(s3) s3.textContent=rate+'%';
+  // Weekly chart
+  var el=document.getElementById('weekly-chart'); if(!el) return;
+  var days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  var weekData=[];
+  for(var i=6;i>=0;i--){
+    var d=new Date(); d.setDate(d.getDate()-i);
+    var ds=d.toISOString().split('T')[0];
+    weekData.push({label:days[(d.getDay()+6)%7], count:tasks.filter(function(t){return t.date===ds&&t.done;}).length});
+  }
+  var maxVal=Math.max(1,Math.max.apply(null,weekData.map(function(w){return w.count;})));
+  el.innerHTML='<div style="display:flex;align-items:flex-end;gap:8px;height:100px;margin-bottom:.5rem">'+
+    weekData.map(function(w){
+      var pct=Math.max(4,Math.round(w.count/maxVal*100));
+      return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%">'+
+        '<div style="flex:1;display:flex;align-items:flex-end;width:100%">'+
+          '<div class="bar" style="height:'+pct+'%;width:100%" title="'+w.count+' completed"></div></div>'+
+        '<div class="bar-label">'+w.label+'</div></div>';
+    }).join('')+'</div>';
+  // Habits
+  var hel=document.getElementById('habits-list'); if(!hel) return;
+  var today=todayStr();
+  var datesLast7=[];
+  for(var i=6;i>=0;i--){ var d=new Date(); d.setDate(d.getDate()-i); datesLast7.push(d.toISOString().split('T')[0]); }
+  if(!habits.length){ hel.innerHTML='<div style="color:var(--text3);font-size:.85rem;text-align:center;padding:1.5rem">No habits tracked yet.</div>'; return; }
+  hel.innerHTML=habits.map(function(h){
+    var streak=calcStreak(h.history||[]);
+    var dots=datesLast7.map(function(ds){
+      var done=(h.history||[]).indexOf(ds)>-1;
+      return '<div class="habit-dot '+(done?'done':'')+'" onclick="toggleHabit(\''+h.id+'\',\''+ds+'\')" title="'+ds+'"></div>';
+    }).join('');
+    return '<div style="margin-bottom:1.25rem">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">'+
+        '<span style="font-weight:600;font-size:.9rem">'+escHtml(h.name)+'</span>'+
+        '<div style="display:flex;align-items:center;gap:8px">'+
+          '<span style="font-size:.8rem;color:var(--warn)">🔥 '+streak+' day streak</span>'+
+          '<span class="icon-btn btn-danger btn-sm" onclick="deleteHabit(\''+h.id+'\')" style="width:28px;height:28px;font-size:.75rem">🗑</span>'+
+        '</div></div>'+
+      '<div class="habit-grid">'+dots+'</div></div>';
+  }).join('');
+}
+
+function calcStreak(history){
+  if(!history.length) return 0;
+  var streak=0, d=new Date();
+  while(true){
+    var ds=d.toISOString().split('T')[0];
+    if(history.indexOf(ds)>-1){ streak++; d.setDate(d.getDate()-1); }
+    else if(streak===0){ d.setDate(d.getDate()-1); var ys=d.toISOString().split('T')[0]; if(history.indexOf(ys)>-1){streak++;d.setDate(d.getDate()-1);continue;} break; }
+    else break;
+  }
+  return streak;
+}
+function toggleHabit(id,ds){
+  var h=habits.find(function(x){return x.id===id;}); if(!h) return;
+  if(!h.history) h.history=[];
+  var idx=h.history.indexOf(ds);
+  if(idx>-1) h.history.splice(idx,1); else h.history.push(ds);
+  saveData('habits',habits); renderAnalytics();
+  if(idx===-1) confetti();
+}
+function addHabit(){ var n=prompt('Habit name (e.g. Drink Water 💧):'); if(!n) return; habits.push({id:uid(),name:n,history:[]}); saveData('habits',habits); renderAnalytics(); }
+function deleteHabit(id){ if(!confirm('Delete habit?')) return; habits=habits.filter(function(h){return h.id!==id;}); saveData('habits',habits); renderAnalytics(); }
+
+// ── WORLD CLOCKS ──
+function renderWorldClocks(){
+  var el=document.getElementById('world-clocks-grid'); if(!el) return;
+  if(!worldTZs.length){ el.innerHTML='<div class="glass-card" style="grid-column:span 2;text-align:center;padding:3rem;color:var(--text3)">No world clocks added.</div>'; return; }
+  el.innerHTML=worldTZs.map(function(tz,idx){
+    var now=new Date();
+    var t='--:--'; var d='--';
+    try{ t=now.toLocaleTimeString('en-US',{timeZone:tz.tz,hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:!settings.clockFormat24}); d=now.toLocaleDateString('en-US',{timeZone:tz.tz,weekday:'short',month:'short',day:'numeric'}); }catch(e){}
+    return '<div class="glass-card" style="display:flex;justify-content:space-between;align-items:center">'+
+      '<div><div style="font-weight:700;font-size:1rem">'+escHtml(tz.name)+'</div><div style="font-size:.78rem;color:var(--text2);margin-top:2px">'+d+'</div></div>'+
+      '<div style="display:flex;align-items:center;gap:12px">'+
+        '<span style="font-family:monospace;font-size:1.4rem;font-weight:700">'+t+'</span>'+
+        '<span class="icon-btn btn-danger" onclick="removeWorldClock('+idx+')">✕</span></div></div>';
+  }).join('');
+}
+function updateWorldClockTimes(){
+  // Lightweight update without full re-render
+}
+function addWorldClock(){
+  var tzOptions=['UTC','Europe/London','Europe/Paris','Europe/Berlin','Asia/Tokyo','Asia/Dubai','Asia/Kolkata','America/New_York','America/Chicago','America/Los_Angeles','Australia/Sydney','Africa/Johannesburg','Africa/Lagos','America/Sao_Paulo'];
+  var tz=prompt('Enter timezone (e.g. America/Chicago, Asia/Tokyo):\n\nCommon options:\n'+tzOptions.join('\n'));
+  if(!tz) return;
+  var name=prompt('Display label (e.g. Chicago, Tokyo):');
+  if(!name) return;
+  worldTZs.push({name:name,tz:tz});
+  saveData('world_tzs',worldTZs);
+  renderWorldClocks();
+}
+function removeWorldClock(idx){ worldTZs.splice(idx,1); saveData('world_tzs',worldTZs); renderWorldClocks(); }
+
+// ── WEATHER (WeatherAPI.com) ──
+var WEATHER_API_KEY = 'd938db4675324176a9895602261807';
+
+function loadWeather(){
+  var statusEl=document.getElementById('weather-status');
+  if(statusEl) statusEl.textContent='📍 Requesting location…';
+  if(!navigator.geolocation){
+    // Fallback: use IP-based location via auto:ip
+    if(statusEl) statusEl.textContent='📡 GPS unavailable, using IP location…';
+    fetchWeather('auto:ip');
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(function(pos){
+    var lat=pos.coords.latitude, lon=pos.coords.longitude;
+    if(statusEl) statusEl.textContent='🌐 Fetching weather for your location…';
+    fetchWeather(lat+','+lon);
+  },function(err){
+    // Fallback on denial
+    if(statusEl) statusEl.textContent='📡 GPS denied, falling back to IP location…';
+    fetchWeather('auto:ip');
+  },{timeout:8000});
+}
+
+function loadWeatherByCity(){
+  var city = prompt('Enter city name (e.g. Paris, New York, Tokyo):');
+  if(!city) return;
+  var statusEl=document.getElementById('weather-status');
+  if(statusEl) statusEl.textContent='🌐 Searching weather for "'+city+'"…';
+  fetchWeather(city);
+}
+
+function fetchWeather(query){
+  var statusEl=document.getElementById('weather-status');
+  var url='https://api.weatherapi.com/v1/current.json?key='+WEATHER_API_KEY+'&q='+encodeURIComponent(query)+'&aqi=no';
+  fetch(url).then(function(r){
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    return r.json();
+  }).then(function(data){
+    var cur = data.current;
+    var loc = data.location;
+    weatherData = {
+      temp: Math.round(cur.temp_c),
+      feelsLike: Math.round(cur.feelslike_c),
+      desc: cur.condition.text,
+      iconUrl: 'https:'+cur.condition.icon.replace('64x64','128x128'),
+      iconSmall: 'https:'+cur.condition.icon,
+      humidity: cur.humidity,
+      wind: Math.round(cur.wind_kph),
+      uv: cur.uv,
+      city: loc.name,
+      region: loc.region,
+      country: loc.country,
+      localTime: loc.localtime
+    };
+    if(statusEl) statusEl.textContent='✅ Weather loaded for '+loc.name+', '+loc.country+'!';
+    saveSetting('weatherEnabled',true);
+    saveSetting('lastWeatherQuery',query);
+    renderWeatherUI();
+  }).catch(function(e){
+    if(statusEl) statusEl.textContent='❌ Weather fetch failed: '+e.message;
+    console.error('Weather error:',e);
+  });
+}
+
+function renderWeatherUI(){
+  if(!weatherData) return;
+  var w = weatherData;
+  // Dashboard weather card
+  var html='<div style="display:flex;flex-direction:column;gap:1rem">'+
+    '<div style="display:flex;align-items:center;gap:16px">'+
+      '<img src="'+w.iconUrl+'" alt="'+escHtml(w.desc)+'" style="width:80px;height:80px;filter:drop-shadow(0 0 8px rgba(56,189,248,.3))">'+
+      '<div>'+
+        '<div style="font-size:2.8rem;font-weight:800;line-height:1">'+w.temp+'°C</div>'+
+        '<div style="font-size:.88rem;color:var(--text2);margin-top:4px">Feels like '+w.feelsLike+'°C</div>'+
+        '<div style="font-size:.95rem;font-weight:600;margin-top:2px">'+escHtml(w.desc)+'</div>'+
+      '</div>'+
+    '</div>'+
+    '<div style="font-size:.82rem;color:var(--accent2);font-weight:600">📍 '+escHtml(w.city)+', '+escHtml(w.country)+'</div>'+
+    '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem">'+
+      weatherStatCard('💧',w.humidity+'%','Humidity')+
+      weatherStatCard('💨',w.wind+' km/h','Wind')+
+      weatherStatCard('☀️',w.uv,'UV Index')+
+      weatherStatCard('🔄','','Refresh','loadWeather()')+
+    '</div>'+
+  '</div>';
+  var el=document.getElementById('weather-content'); if(el) el.innerHTML=html;
+  // Topbar mini widget
+  var tb=document.getElementById('weather-topbar');
+  if(tb){
+    tb.style.display='flex';
+    tb.innerHTML='<img src="'+w.iconSmall+'" style="width:28px;height:28px">'+
+      '<div><div class="weather-temp">'+w.temp+'°C</div>'+
+      '<div class="weather-desc">'+escHtml(w.city)+'</div></div>';
+  }
+}
+function weatherStatCard(icon,value,label,onclick){
+  var click = onclick ? ' cursor:pointer" onclick="'+onclick+'"' : '"';
+  return '<div class="glass-card" style="padding:.6rem .5rem;text-align:center;'+click+'>'+
+    '<div style="font-size:1rem">'+icon+'</div>'+
+    (value?'<div style="font-size:1.1rem;font-weight:700;margin-top:2px">'+value+'</div>':'')+
+    '<div style="font-size:.65rem;color:var(--text2);margin-top:1px">'+label+'</div></div>';
+}
+
+// ── AUDIO (Web Audio API Synthesizer) ──
+function initAudio(){
+  if(audioCtx) {
+    if (audioCtx.state === 'suspended') {
+      try { audioCtx.resume(); } catch(e) {}
+    }
+    return;
+  }
+  try{ audioCtx=new(window.AudioContext||window.webkitAudioContext)(); }catch(e){}
+}
+function makeGain(vol){
+  var g=audioCtx.createGain(); g.gain.value=vol||.6; g.connect(audioCtx.destination); return g;
+}
+function stopAudio(){
+  activeNodes.forEach(function(n){
+    if (n) {
+      if (typeof n.stop === 'function') {
+        try { n.stop(); } catch(e) {}
+      }
+      if (typeof n.disconnect === 'function') {
+        try { n.disconnect(); } catch(e) {}
+      }
+    }
+  });
+  activeNodes=[];
+  if (audioCtx && audioCtx.state === 'running') {
+    try { audioCtx.suspend(); } catch(e) {}
+  }
+}
+function playSound(name,vol){
+  initAudio(); if(!audioCtx) return;
+  stopAudio();
+  vol=vol||.7;
+  
+  if (name && (name.startsWith('http://') || name.startsWith('https://'))) {
+    playCustomSound(name, vol);
+    return;
+  }
+  
+  if(name==='classic'){ classicAlarm(vol); }
+  else if(name==='digital'){ digitalAlarm(vol); }
+  else if(name==='piano'){ pianoAlarm(vol); }
+  else if(name==='birds'){ birdsAlarm(vol); }
+  else if(name==='ocean'){ noiseAtmos('ocean',vol); }
+  else if(name==='rain'){ noiseAtmos('rain',vol); }
+  else if(name==='meditation'){ meditationAlarm(vol); }
+  else if(name==='emergency'){ emergencyAlarm(vol); }
+  else { classicAlarm(vol); }
+}
+
+function playCustomSound(url, vol) {
+  var audio = new Audio(url);
+  audio.volume = vol;
+  audio.loop = true;
+  audio.play().catch(function(e){ console.error('Audio play failed:', e); });
+  activeNodes.push({
+    stop: function() { audio.pause(); audio.src = ''; },
+    disconnect: function() {}
+  });
+}
+function playAmbient(name){ if(name==='none'){stopAudio();return;} playSound(name,.35); }
+function classicAlarm(vol){
+  var interval=setInterval(function(){
+    if(!audioCtx) return;
+    var t=audioCtx.currentTime, g=makeGain(0), o=audioCtx.createOscillator();
+    o.type='sine'; o.frequency.value=2000;
+    g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(vol*.3,t+.02); g.gain.setValueAtTime(vol*.3,t+.08); g.gain.linearRampToValueAtTime(0,t+.1);
+    o.connect(g); o.start(t); o.stop(t+.12); activeNodes.push(o);
+  },200);
+  activeNodes.push({stop:function(){clearInterval(interval);},disconnect:function(){}});
+}
+function digitalAlarm(vol){
+  var interval=setInterval(function(){
+    if(!audioCtx) return;
+    var t=audioCtx.currentTime, g=makeGain(0), o=audioCtx.createOscillator();
+    o.type='square'; o.frequency.value=1000;
+    g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(vol*.25,t+.01); g.gain.setValueAtTime(vol*.25,t+.15); g.gain.linearRampToValueAtTime(0,t+.18);
+    o.connect(g); o.start(t); o.stop(t+.2); activeNodes.push(o);
+  },350);
+  activeNodes.push({stop:function(){clearInterval(interval);},disconnect:function(){}});
+}
+function pianoAlarm(vol){
+  var freqs=[261.63,329.63,392,523.25];
+  var playChord=function(){
+    if(!audioCtx) return;
+    freqs.forEach(function(f,i){
+      var t=audioCtx.currentTime+i*.05, g=makeGain(0), o=audioCtx.createOscillator();
+      o.type='triangle'; o.frequency.value=f;
+      g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(vol*.2,t+.1); g.gain.exponentialRampToValueAtTime(.001,t+2.5);
+      o.connect(g); o.start(t); o.stop(t+2.6); activeNodes.push(o);
+    });
+  };
+  playChord();
+  var interval=setInterval(playChord,3000);
+  activeNodes.push({stop:function(){clearInterval(interval);},disconnect:function(){}});
+}
+function birdsAlarm(vol){
+  var doChirp=function(){
+    if(!audioCtx) return;
+    var t=audioCtx.currentTime, g=makeGain(0), o=audioCtx.createOscillator();
+    o.type='sine'; o.frequency.setValueAtTime(2500,t); o.frequency.exponentialRampToValueAtTime(4500,t+.1); o.frequency.exponentialRampToValueAtTime(3000,t+.25);
+    g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(vol*.3,t+.05); g.gain.exponentialRampToValueAtTime(.001,t+.25);
+    o.connect(g); o.start(t); o.stop(t+.3); activeNodes.push(o);
+  };
+  doChirp(); setTimeout(doChirp,350);
+  var interval=setInterval(function(){ doChirp(); setTimeout(doChirp,350); },1800);
+  activeNodes.push({stop:function(){clearInterval(interval);},disconnect:function(){}});
+}
+function noiseAtmos(type,vol){
+  var buf=audioCtx.createBuffer(1,audioCtx.sampleRate*4,audioCtx.sampleRate);
+  var data=buf.getChannelData(0);
+  for(var i=0;i<data.length;i++) data[i]=Math.random()*2-1;
+  var src=audioCtx.createBufferSource(); src.buffer=buf; src.loop=true;
+  var filt=audioCtx.createBiquadFilter();
+  if(type==='ocean'){ filt.type='lowpass'; filt.frequency.value=600; }
+  else{ filt.type='highpass'; filt.frequency.value=1000; }
+  var g=makeGain(vol*.6); src.connect(filt); filt.connect(g); src.start(); activeNodes.push(src);
+}
+function meditationAlarm(vol){
+  var g=makeGain(vol*.4);
+  var oL=audioCtx.createOscillator(), oR=audioCtx.createOscillator();
+  var pL=audioCtx.createStereoPanner(), pR=audioCtx.createStereoPanner();
+  oL.frequency.value=432; oR.frequency.value=436;
+  pL.pan.value=-1; pR.pan.value=1;
+  oL.connect(pL); pL.connect(g); oR.connect(pR); pR.connect(g);
+  oL.start(); oR.start(); activeNodes.push(oL,oR);
+}
+function emergencyAlarm(vol){
+  var doSiren=function(){
+    if(!audioCtx) return;
+    var t=audioCtx.currentTime, g=makeGain(0), o=audioCtx.createOscillator();
+    o.type='sawtooth'; o.frequency.setValueAtTime(600,t); o.frequency.linearRampToValueAtTime(1200,t+.4); o.frequency.linearRampToValueAtTime(600,t+.8);
+    g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(vol*.3,t+.05); g.gain.setValueAtTime(vol*.3,t+.75); g.gain.linearRampToValueAtTime(0,t+.8);
+    o.connect(g); o.start(t); o.stop(t+.8); activeNodes.push(o);
+  };
+  doSiren();
+  var interval=setInterval(doSiren,800);
+  activeNodes.push({stop:function(){clearInterval(interval);},disconnect:function(){}});
+}
+
+// ── SPEECH SYNTHESIS ──
+function speak(text){
+  if(!window.speechSynthesis) return;
+  speechSynthesis.cancel();
+  var u=new SpeechSynthesisUtterance(text);
+  u.volume=settings.alarmVolume;
+  u.rate=.95; u.pitch=1;
+  if(settings.voiceName){
+    var v=speechSynthesis.getVoices().find(function(x){return x.name===settings.voiceName;});
+    if(v) u.voice=v;
+  }
+  speechSynthesis.speak(u);
+}
+function loadVoices(){
+  var sel=document.getElementById('set-voice'); if(!sel) return;
+  if (!window.speechSynthesis) {
+    sel.innerHTML = '<option value="">Default (Voice Synth Not Supported)</option>';
+    return;
+  }
+  var populate=function(){
+    var voices=speechSynthesis.getVoices();
+    sel.innerHTML='<option value="">Default</option>'+voices.map(function(v){
+      return '<option value="'+escAttr(v.name)+'"'+(v.name===settings.voiceName?' selected':'')+'>'+(v.name)+' ('+v.lang+')</option>';
+    }).join('');
+  };
+  populate();
+  if(speechSynthesis.onvoiceschanged!==undefined) speechSynthesis.onvoiceschanged=populate;
+}
+function testVoice(){ speak('Hello '+(settings.userName||'friend')+'. Smart Alarm Pro is ready!'); }
+function getGreetingSpeech(){
+  var h=new Date().getHours(), g=h<12?'Good morning':h<18?'Good afternoon':'Good evening';
+  return g+' '+(settings.userName||'there')+'! It is '+new Date().toLocaleTimeString()+'.';
+}
+
+// ── STOPWATCH ──
+function swStartStop(){
+  var btn=document.getElementById('sw-start-btn'), lbtn=document.getElementById('sw-lap-btn');
+  if(swRunning){
+    swRunning=false; clearInterval(swInterval);
+    btn.textContent='▶ Resume'; lbtn.textContent='Reset'; btn.style.background='';
+  } else {
+    swRunning=true; swStart=Date.now()-swTime;
+    btn.textContent='⏸ Pause'; lbtn.textContent='Lap';
+    btn.style.background='linear-gradient(135deg,var(--danger),#f97316)';
+    swInterval=setInterval(swTick,47);
+  }
+}
+function swTick(){
+  swTime=Date.now()-swStart;
+  var el=document.getElementById('sw-digits'); if(!el) return;
+  var ms=Math.floor((swTime%1000)/10), s=Math.floor(swTime/1000)%60, m=Math.floor(swTime/60000), h=Math.floor(swTime/3600000);
+  var str=(h?pad(h)+':':'')+pad(m)+':'+pad(s);
+  el.innerHTML=str+'<span style="font-size:1.5rem;color:var(--text2)">.'+(ms<10?'0':'')+ms+'</span>';
+}
+function swLapReset(){
+  if(swRunning){
+    swLaps.unshift({lap:swTime, label:'Lap '+( swLaps.length+1)});
+    renderLaps();
+  } else {
+    swRunning=false; clearInterval(swInterval); swTime=0; swStart=0; swLaps=[];
+    var el=document.getElementById('sw-digits'); if(el) el.innerHTML='00:00<span style="font-size:1.5rem;color:var(--text2)">.00</span>';
+    document.getElementById('sw-start-btn').textContent='▶ Start'; document.getElementById('sw-start-btn').style.background='';
+    document.getElementById('sw-lap-btn').textContent='Reset';
+    renderLaps();
+  }
+}
+function renderLaps(){
+  var el=document.getElementById('timer-right-content'); if(!el) return;
+  if(!swLaps.length){ el.innerHTML='<div style="color:var(--text3);font-size:.85rem;text-align:center;padding:2rem">Hit Lap to record splits.</div>'; return; }
+  var fmtMs=function(ms){ var t=Math.floor((ms%1000)/10),s=Math.floor(ms/1000)%60,m=Math.floor(ms/60000); return pad(m)+':'+pad(s)+'.'+(t<10?'0':'')+t; };
+  el.innerHTML='<div style="display:flex;flex-direction:column;gap:2px">'+swLaps.map(function(l,i){
+    return '<div class="lap-item"><span style="color:var(--text2)">#'+(swLaps.length-i)+'</span><span style="font-family:monospace">'+fmtMs(l.lap)+'</span></div>';
+  }).join('')+'</div>';
+}
+
+// ── COUNTDOWN ──
+function cdStartStop(){
+  var btn=document.getElementById('cd-start-btn');
+  if(cdRunning){
+    cdRunning=false; clearInterval(cdInterval); btn.textContent='▶ Resume';
+  } else {
+    if(cdRemain===0){
+      var h=+document.getElementById('cd-h').value, m=+document.getElementById('cd-m').value, s=+document.getElementById('cd-s').value;
+      cdTotal=(h*3600)+(m*60)+s; cdRemain=cdTotal;
+    }
+    if(!cdRemain){ alert('Set a time first!'); return; }
+    cdRunning=true; btn.textContent='⏸ Pause';
+    cdInterval=setInterval(function(){
+      cdRemain--;
+      var el=document.getElementById('cd-digits');
+      if(el){ var h=Math.floor(cdRemain/3600),m=Math.floor((cdRemain%3600)/60),s=cdRemain%60; el.textContent=pad(h)+':'+pad(m)+':'+pad(s); }
+      var ring=document.getElementById('cd-ring');
+      if(ring) ring.style.strokeDashoffset=String(691-Math.round((cdRemain/cdTotal)*691));
+      if(cdRemain<=0){ cdRunning=false; clearInterval(cdInterval); playSound('bell',.8); speak('Countdown complete!'); btn.textContent='▶ Start'; }
+    },1000);
+  }
+}
+function cdReset(){ cdRunning=false; clearInterval(cdInterval); cdRemain=0; cdTotal=0; var el=document.getElementById('cd-digits'); if(el) el.textContent='00:00:00'; var ring=document.getElementById('cd-ring'); if(ring) ring.style.strokeDashoffset='0'; document.getElementById('cd-start-btn').textContent='▶ Start'; }
+
+// ── POMODORO ──
+function setPomo(mode){
+  pmMode=mode; var times={focus:25*60,'short':5*60,'long':15*60}; pmRemain=times[mode];
+  ['focus','short','long'].forEach(function(m){ var b=document.getElementById('pm-'+m+'-btn'); if(b){b.style.background='';b.style.color='';b.classList.remove('btn-primary');b.classList.add('btn-secondary');} });
+  var active=document.getElementById('pm-'+mode+'-btn'); if(active){active.style.background='var(--accent)';active.style.color='#fff';}
+  var labels={focus:'Focus Session',short:'Short Break',long:'Long Break'};
+  var el=document.getElementById('pm-mode-label'); if(el) el.textContent=labels[mode];
+  var de=document.getElementById('pm-digits'); if(de){ var m=Math.floor(pmRemain/60),s=pmRemain%60; de.textContent=pad(m)+':'+pad(s); }
+  var ring=document.getElementById('pm-ring'); if(ring) ring.style.strokeDashoffset='0';
+}
+function pmStartStop(){
+  var btn=document.getElementById('pm-start-btn');
+  if(pmRunning){
+    pmRunning=false; clearInterval(pmInterval); stopAudio(); btn.textContent='▶ Start Focus';
+    btn.style.background='';
+  } else {
+    pmRunning=true; btn.textContent='⏸ Pause';
+    btn.style.background='linear-gradient(135deg,var(--danger),#f97316)';
+    var sound=document.getElementById('pm-sound').value;
+    if(sound!=='none') playAmbient(sound);
+    var maxTime={focus:25*60,short:5*60,long:15*60}[pmMode]||25*60;
+    pmInterval=setInterval(function(){
+      pmRemain--;
+      var el=document.getElementById('pm-digits'); if(el){ var m=Math.floor(pmRemain/60),s=pmRemain%60; el.textContent=pad(m)+':'+pad(s); }
+      var ring=document.getElementById('pm-ring'); if(ring) ring.style.strokeDashoffset=String(691-Math.round((pmRemain/maxTime)*691));
+      if(pmRemain<=0){
+        pmRunning=false; clearInterval(pmInterval); stopAudio();
+        btn.textContent='▶ Start Focus'; btn.style.background='';
+        playSound('bell',.8);
+        if(pmMode==='focus'){ pomoCycles++; speak('Focus session complete! Take a break.'); setPomo('short'); }
+        else{ speak('Break is over! Time to focus.'); setPomo('focus'); }
+      }
+    },1000);
+  }
+}
+function pmReset(){ pmRunning=false; clearInterval(pmInterval); stopAudio(); setPomo(pmMode); document.getElementById('pm-start-btn').textContent='▶ Start Focus'; document.getElementById('pm-start-btn').style.background=''; }
+
+// ── TIMER TABS ──
+function switchTimerTab(tab){
+  activeTimerTab=tab;
+  ['sw','cd','pm'].forEach(function(t){
+    var panel=document.getElementById('panel-'+t); if(panel) panel.style.display=t===tab?'block':'none';
+    var btn=document.getElementById('tab-'+t); if(btn){ btn.style.background=t===tab?'var(--accent)':''; btn.style.color=t===tab?'#fff':''; }
+  });
+  var titles={sw:'Laps & Records',cd:'Timer Settings',pm:'Pomodoro Focus'};
+  var el=document.getElementById('timer-right-title'); if(el) el.textContent=titles[tab];
+  if(tab==='cd'){ document.getElementById('timer-right-content').innerHTML='<div style="color:var(--text2);font-size:.85rem;line-height:1.6">Set hours/minutes/seconds on the left, then press Start.<br><br>A synthesized bell will ring when time is up.</div>'; }
+  if(tab==='pm'){ document.getElementById('timer-right-content').innerHTML='<div style="color:var(--text2);font-size:.85rem;line-height:1.6">Pomodoro technique:<br><br>✅ 25-min focused work session<br>☕ 5-min short break<br>🌴 15-min long break (after 4 cycles)<br><br>Cycles completed: <strong style="color:var(--warn)">'+pomoCycles+'</strong></div>'; }
+}
+
+// ── THEMES ──
+var themeVars = {
+  default:{accent:'#6366f1',accentRgb:'99,102,241',accent2:'#38bdf8',bg:'#0b0f19',bgGrad:'linear-gradient(135deg,#0f172a,#1e1b4b,#020617)'},
+  purple:{accent:'#d946ef',accentRgb:'217,70,239',accent2:'#a855f7',bg:'#0c0017',bgGrad:'linear-gradient(135deg,#180029,#3b0066,#0d001a)'},
+  green:{accent:'#10b981',accentRgb:'16,185,129',accent2:'#6ee7b7',bg:'#011c16',bgGrad:'linear-gradient(135deg,#022c22,#064e3b,#02120f)'},
+  orange:{accent:'#ea580c',accentRgb:'234,88,12',accent2:'#fdba74',bg:'#1c0a02',bgGrad:'linear-gradient(135deg,#2d0f02,#451a03,#170500)'},
+  pink:{accent:'#db2777',accentRgb:'219,39,119',accent2:'#fda4af',bg:'#1c020c',bgGrad:'linear-gradient(135deg,#2b0414,#4c0519,#150007)'},
+  cyberpunk:{accent:'#ff007f',accentRgb:'255,0,127',accent2:'#00f2fe',bg:'#0b0213',bgGrad:'linear-gradient(135deg,#12041d,#03001e,#050515)'},
+  black:{accent:'#38bdf8',accentRgb:'56,189,248',accent2:'#a855f7',bg:'#000',bgGrad:'none'},
+  light:{accent:'#3b82f6',accentRgb:'59,130,246',accent2:'#0ea5e9',bg:'#f8fafc',bgGrad:'linear-gradient(135deg,#f1f5f9,#e2e8f0)'}
+};
+function applyTheme(name){
+  var t=themeVars[name]||themeVars.default;
+  var r=document.documentElement;
+  r.style.setProperty('--accent',t.accent);
+  r.style.setProperty('--accentRgb',t.accentRgb);
+  r.style.setProperty('--accentGlow','rgba('+t.accentRgb+',.5)');
+  r.style.setProperty('--accent2',t.accent2);
+  r.style.setProperty('--bg',t.bg);
+  document.body.style.background=t.bg;
+  document.body.style.backgroundImage=t.bgGrad;
+  if(name==='light'){
+    r.style.setProperty('--text','#0f172a');
+    r.style.setProperty('--text2','#475569');
+    r.style.setProperty('--text3','#94a3b8');
+    r.style.setProperty('--glass','rgba(255,255,255,.6)');
+    r.style.setProperty('--glass2','rgba(255,255,255,.8)');
+    r.style.setProperty('--border','rgba(15,23,42,.08)');
+    r.style.setProperty('--border2','rgba(15,23,42,.15)');
+    r.style.setProperty('--bg2','#fff');
+  } else {
+    r.style.setProperty('--text','#f8fafc');
+    r.style.setProperty('--text2','#94a3b8');
+    r.style.setProperty('--text3','#64748b');
+    r.style.setProperty('--glass','rgba(255,255,255,.04)');
+    r.style.setProperty('--glass2','rgba(255,255,255,.08)');
+    r.style.setProperty('--border','rgba(255,255,255,.08)');
+    r.style.setProperty('--border2','rgba(255,255,255,.15)');
+    r.style.setProperty('--bg2','#111827');
+  }
+  document.querySelectorAll('.theme-swatch').forEach(function(el){ el.classList.toggle('selected',el.getAttribute('data-theme')===name); });
+}
+document.querySelectorAll('.theme-swatch').forEach(function(el){
+  el.addEventListener('click',function(){
+    var t=el.getAttribute('data-theme');
+    saveSetting('theme',t);
+    applyTheme(t);
+  });
+});
+
+// ── SETTINGS UI ──
+function applySettingsUI(){
+  var n=document.getElementById('set-name'); if(n) n.value=settings.userName||'';
+  var h=document.getElementById('set-24h'); if(h) h.checked=settings.clockFormat24;
+  var s=document.getElementById('set-secs'); if(s) s.checked=settings.showSeconds!==false;
+  var v=document.getElementById('set-alarm-vol'); if(v){ v.value=settings.alarmVolume||.8; document.getElementById('avol-lbl').textContent=Math.round((settings.alarmVolume||.8)*100)+'%'; }
+  var sb=document.getElementById('set-sb-autosync'); if(sb) sb.checked=settings.supabaseAutoSync===true;
+  applyTheme(settings.theme||'default');
+  updateNotifStatus();
+  updateSupabaseStatus();
+}
+
+// ── NOTIFICATIONS ──
+function sendNotification(title,body){
+  if(window.Notification && window.Notification.permission==='granted'){
+    try{ new window.Notification(title,{body:body,icon:'assets/icons/icon-192.png'}); }catch(e){}
+  }
+}
+function requestNotifPermission(){
+  if(!window.Notification){ document.getElementById('notif-status').textContent='Not supported in this browser.'; return; }
+  window.Notification.requestPermission().then(function(p){ updateNotifStatus(); });
+}
+function updateNotifStatus(){
+  var el=document.getElementById('notif-status'); if(!el) return;
+  if(!window.Notification){ el.textContent='Notifications not supported.'; return; }
+  var states={granted:'✅ Notifications enabled.',denied:'❌ Blocked. Allow in browser settings.',default:'⚠️ Click Enable to allow notifications.'};
+  el.textContent=states[window.Notification.permission]||'';
+}
+function updateNotifBadge(){
+  var badge=document.getElementById('notif-badge');
+  if(!badge) return;
+  if(history.length>0){ badge.textContent=history.length; badge.style.display='flex'; }
+  else badge.style.display='none';
+}
+function toggleNotifDrop(){
+  var el=document.getElementById('notif-drop');
+  el.style.display=el.style.display==='none'?'block':'none';
+  if(el.style.display==='block') renderNotifDrop();
+}
+document.addEventListener('click',function(e){ if(!e.target.closest('#notif-btn')&&!e.target.closest('#notif-drop')) document.getElementById('notif-drop').style.display='none'; });
+function renderNotifDrop(){
+  var el=document.getElementById('notif-list'); if(!el) return;
+  if(!history.length){ el.innerHTML='<div style="color:var(--text3);font-size:.82rem;text-align:center;padding:.5rem">No history.</div>'; return; }
+  el.innerHTML=history.slice(0,15).map(function(h){
+    var colors={dismissed:'var(--accent2)',snoozed:'var(--warn)',completed:'var(--success)',missed:'var(--danger)'};
+    return '<div style="padding:.5rem;border-bottom:1px solid rgba(255,255,255,.04);font-size:.8rem">'+
+      '⏰ <strong>'+escHtml(h.title)+'</strong> was <span style="color:'+colors[h.action]+'">'+h.action+'</span>'+
+      '<div style="font-size:.7rem;color:var(--text3)">'+new Date(h.ts).toLocaleString()+'</div></div>';
+  }).join('');
+}
+function clearHistory(){ history=[]; saveData('alarm_history',history); renderNotifDrop(); updateNotifBadge(); }
+
+// ── BACKUP ──
+function exportBackup(){
+  var data={settings:settings,alarms:alarms,tasks:tasks,habits:habits,worldTZs:worldTZs};
+  var json=JSON.stringify(data,null,2);
+  var a=document.createElement('a'); a.href='data:text/json;charset=utf-8,'+encodeURIComponent(json);
+  a.download='smart_alarm_backup_'+todayStr()+'.json'; a.click();
+}
+function importBackup(input){
+  var file=input.files[0]; if(!file) return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var data=JSON.parse(e.target.result);
+      if(data.settings){settings=data.settings;saveSettings();}
+      if(data.alarms){alarms=data.alarms;saveData('alarms',alarms);}
+      if(data.tasks){tasks=data.tasks;saveData('tasks',tasks);}
+      if(data.habits){habits=data.habits;saveData('habits',habits);}
+      if(data.worldTZs){worldTZs=data.worldTZs;saveData('world_tzs',worldTZs);}
+      alert('✅ Backup imported successfully!'); renderAll(); applySettingsUI();
+    }catch(ex){ alert('❌ Invalid JSON file: '+ex.message); }
+  };
+  reader.readAsText(file);
+}
+
+// ── MODAL HELPERS ──
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-bg').forEach(function(bg){
+  bg.addEventListener('click',function(e){ if(e.target===bg) bg.classList.remove('open'); });
+});
+
+// ── CONFETTI ──
+function confetti(){
+  var c=document.createElement('canvas');
+  c.style.cssText='position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:9998';
+  document.body.appendChild(c);
+  var ctx=c.getContext('2d'), W=c.width=window.innerWidth, H=c.height=window.innerHeight;
+  var colors=['#6366f1','#38bdf8','#10b981','#f59e0b','#db2777','#ea580c'];
+  var parts=Array.from({length:100},function(){
+    return{x:W/2,y:H*.6,vx:(Math.random()-0.5)*18,vy:-(Math.random()*15+5),r:Math.random()*5+3,
+      color:colors[Math.floor(Math.random()*colors.length)],alpha:1,rot:Math.random()*360,rSpeed:Math.random()*10-5};
+  });
+  var frame=function(){
+    ctx.clearRect(0,0,W,H);
+    var active=false;
+    parts.forEach(function(p){
+      if(p.alpha<=0) return;
+      active=true;
+      p.vy+=.4; p.x+=p.vx; p.y+=p.vy; p.rot+=p.rSpeed; p.alpha-=.014;
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot*Math.PI/180);
+      ctx.fillStyle=p.color; ctx.globalAlpha=p.alpha;
+      ctx.fillRect(-p.r,-p.r,p.r*2,p.r*2); ctx.restore();
+    });
+    if(active) requestAnimationFrame(frame); else c.remove();
+  };
+  requestAnimationFrame(frame);
+}
+
+// ── SUPABASE CLOUD BACKUP & RESTORE ──
+function updateSupabaseStatus() {
+  var el = document.getElementById('supabase-status');
+  if (!el) return;
+  if (!window.supabase) {
+    el.textContent = "Status: CDN script failed to load. Check internet.";
+    return;
+  }
+  if (!supabase) {
+    el.textContent = "Status: Client not initialized.";
+    return;
+  }
+  el.textContent = "Status: Connected to " + SUPABASE_URL.replace('https://','').split('.')[0] + " ✅";
+}
+
+async function syncToSupabase(silent) {
+  var el = document.getElementById('supabase-status');
+  if (!supabase) {
+    if (!silent && el) el.textContent = "Status: Error (Supabase not initialized)";
+    return;
+  }
+  
+  if (!silent && el) el.textContent = "Status: Backup in progress... ⏳";
+  
+  var backupId = settings.userName || 'Champion';
+  var payload = {
+    alarms: alarms,
+    tasks: tasks,
+    habits: habits,
+    settings: settings,
+    worldTZs: worldTZs
+  };
+  
+  try {
+    const { data, error } = await supabase
+      .from('user_backups')
+      .upsert({ id: backupId, payload: payload, updated_at: new Date() });
+      
+    if (error) throw error;
+    if (el) el.textContent = "Status: Synced (Cloud Backup Saved! ✅)";
+    if (!silent) alert("✅ Success: Data backed up to Supabase Cloud!");
+  } catch (e) {
+    console.error("Supabase backup failed:", e);
+    if (el) el.textContent = "Status: Sync failed (Ensure 'user_backups' table exists)";
+    if (!silent) {
+      alert("❌ Supabase Sync Failed:\n" + e.message + "\n\nMake sure you created a 'user_backups' table in your Supabase project SQL editor.");
+    }
+  }
+}
+
+async function syncFromSupabase() {
+  var el = document.getElementById('supabase-status');
+  if (!supabase) {
+    alert("❌ Error: Supabase client is not initialized.");
+    return;
+  }
+  
+  var backupId = prompt("Enter the backup profile name to restore (e.g. Samuel, Champion):", settings.userName || 'Champion');
+  if (!backupId) return;
+  
+  if (el) el.textContent = "Status: Restoring from Cloud... ⏳";
+  
+  try {
+    const { data, error } = await supabase
+      .from('user_backups')
+      .select('payload')
+      .eq('id', backupId)
+      .single();
+      
+    if (error) throw error;
+    if (!data || !data.payload) {
+      throw new Error("No backup found under the name '" + backupId + "'");
+    }
+    
+    var pl = data.payload;
+    if (pl.settings) { settings = Object.assign(settings, pl.settings); saveSettings(); }
+    if (pl.alarms) { alarms = pl.alarms; saveData('alarms', alarms); }
+    if (pl.tasks) { tasks = pl.tasks; saveData('tasks', tasks); }
+    if (pl.habits) { habits = pl.habits; saveData('habits', habits); }
+    if (pl.worldTZs) { worldTZs = pl.worldTZs; saveData('world_tzs', worldTZs); }
+    
+    if (el) el.textContent = "Status: Restore complete! ✅";
+    alert("✅ Success: Restored data for profile '" + backupId + "' from Supabase!");
+    renderAll();
+    applySettingsUI();
+  } catch (e) {
+    console.error("Supabase restore failed:", e);
+    if (el) el.textContent = "Status: Restore failed";
+    alert("❌ Restore Failed:\n" + e.message);
+  }
+}
+
+// ── GROQ AI INTEGRATIONS (ultra-fast LLM) ──
+async function callGroq(systemPrompt, userPrompt) {
+  var response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + GROQ_API_KEY
+    },
+    body: JSON.stringify({
+      model: 'llama-3.3-70b-versatile',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user',   content: userPrompt }
+      ],
+      temperature: 0.7,
+      max_tokens: 512
+    })
+  });
+
+  if (!response.ok) {
+    var errData = await response.json();
+    throw new Error(
+      (errData.error && errData.error.message) ||
+      'Groq API error: HTTP ' + response.status
+    );
+  }
+
+  var data = await response.json();
+  var text = data.choices &&
+             data.choices[0] &&
+             data.choices[0].message &&
+             data.choices[0].message.content;
+  if (!text) throw new Error('Empty response from Groq');
+  return text.trim();
+}
+
+async function generateAIBriefing() {
+  var btn = document.querySelector('[onclick="generateAIBriefing()"]');
+  if (!btn) return;
+  
+  var origText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = '⚡ Thinking...';
+  appendAIChatLog('system', 'Generating daily briefing...');
+  
+  try {
+    var name = settings.userName || 'Champion';
+    var weatherStr = weatherData ? (weatherData.temp + '°C and ' + weatherData.desc) : 'not loaded';
+    var today = todayStr();
+    var todayTasks = tasks.filter(function(t){ return t.date === today && !t.done; }).map(function(t){ return t.title; }).join(', ');
+    
+    var systemPrompt = "You are a warm, highly motivating bedside voice assistant. Greet the user in exactly 2 short sentences. Summarize their day with positivity. Be brief.";
+    var userPrompt = "User name: " + name + ". Current weather: " + weatherStr + ". Pending tasks for today: " + (todayTasks || 'No pending tasks!') + ". Write a morning greeting briefing.";
+    
+    var text = await callGroq(systemPrompt, userPrompt);
+    appendAIChatLog('ai', text);
+    speak(text);
+  } catch (e) {
+    console.error("AI briefing failed:", e);
+    appendAIChatLog('system', 'AI Briefing failed: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = origText;
+  }
+}
+
+// ── AI INTERACTIVE CO-PILOT CHAT & VOICE ──
+var recognition = null;
+var isListening = false;
+
+function initSpeechRecognition() {
+  if (recognition) return;
+  var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) return;
+  
+  recognition = new SpeechRecognition();
+  recognition.continuous = false;
+  recognition.lang = 'en-US';
+  recognition.interimResults = false;
+  
+  recognition.onstart = function() {
+    isListening = true;
+    var btn = document.getElementById('ai-mic-btn');
+    if (btn) {
+      btn.style.background = 'var(--danger)';
+      btn.style.borderColor = 'var(--dangerGlow)';
+      btn.textContent = '🛑';
+    }
+  };
+  
+  recognition.onend = function() {
+    isListening = false;
+    var btn = document.getElementById('ai-mic-btn');
+    if (btn) {
+      btn.style.background = 'rgba(99,102,241,.15)';
+      btn.style.borderColor = 'rgba(99,102,241,.3)';
+      btn.textContent = '🎙️';
+    }
+  };
+  
+  recognition.onresult = function(event) {
+    var text = event.results[0][0].transcript;
+    var input = document.getElementById('ai-chat-input');
+    if (input) {
+      input.value = text;
+      sendAIChatMessage();
+    }
+  };
+  
+  recognition.onerror = function(event) {
+    console.error("Speech recognition error:", event.error);
+    isListening = false;
+    recognition.stop();
+  };
+}
+
+function toggleVoiceInput() {
+  initSpeechRecognition();
+  if (!recognition) {
+    alert("Speech recognition is not supported in this browser. Please use Chrome, Edge, or Safari.");
+    return;
+  }
+  if (isListening) {
+    recognition.stop();
+  } else {
+    recognition.start();
+  }
+}
+
+async function sendAIChatMessage() {
+  var inputEl = document.getElementById('ai-chat-input');
+  if (!inputEl) return;
+  var text = inputEl.value.trim();
+  if (!text) return;
+  
+  inputEl.value = '';
+  appendAIChatLog('user', text);
+  
+  var logEl = document.getElementById('ai-chat-logs');
+  if (logEl) logEl.scrollTop = logEl.scrollHeight;
+  
+  try {
+    var name = settings.userName || 'Champion';
+    var weatherStr = weatherData ? (weatherData.temp + '°C and ' + weatherData.desc) : 'unknown';
+    var today = todayStr();
+    var todayTasks = tasks.filter(function(t){ return t.date === today && !t.done; }).map(function(t){ return t.title; }).join(', ');
+    
+    var systemPrompt = 
+      "You are the voice assistant for Smart Alarm Pro, a premium bedside productivity companion. " +
+      "Keep your responses warm, positive, helpful, and very brief (1-2 sentences) so they can be spoken aloud. " +
+      "User name: " + name + ". " +
+      "Current weather: " + weatherStr + ". " +
+      "Pending tasks today: " + (todayTasks || 'No pending tasks!') + ". " +
+      "If the user asks you to add a task, format your response to end with: [TASK: task title] (e.g. [TASK: Study JavaScript]). " +
+      "If the user asks you to set an alarm, format your response to end with: [ALARM: HH:MM] (e.g. [ALARM: 07:30]). " +
+      "Keep the spoken text conversational.";
+      
+    var reply = await callGroq(systemPrompt, text);
+    
+    // Parse task or alarm commands
+    var taskMatch = reply.match(/\[TASK:\s*(.*?)\]/);
+    var alarmMatch = reply.match(/\[ALARM:\s*(\d{2}:\d{2})\]/);
+    
+    var cleanReply = reply.replace(/\[TASK:.*?\]/g, '').replace(/\[ALARM:.*?\]/g, '').trim();
+    
+    appendAIChatLog('ai', cleanReply);
+    speak(cleanReply);
+    
+    if (taskMatch) {
+      var taskTitle = taskMatch[1].trim();
+      var newTask = {
+        id: uid(),
+        title: taskTitle,
+        desc: 'Added via AI Bedside Assistant',
+        date: today,
+        time: '',
+        priority: 'Medium',
+        category: 'Personal',
+        done: false
+      };
+      tasks.push(newTask);
+      saveData('tasks', tasks);
+      renderAll();
+      appendAIChatLog('system', "Added task: " + taskTitle);
+    }
+    
+    if (alarmMatch) {
+      var alarmTime = alarmMatch[1].trim();
+      var newAlarm = {
+        id: uid(),
+        title: 'AI Scheduled Alarm',
+        desc: 'Created via voice assistant',
+        time: alarmTime,
+        category: 'Personal',
+        priority: 'Medium',
+        sound: 'classic',
+        voice: true,
+        active: true,
+        repeat: []
+      };
+      alarms.push(newAlarm);
+      saveData('alarms', alarms);
+      renderAll();
+      appendAIChatLog('system', "Created alarm for " + alarmTime);
+    }
+    
+  } catch(e) {
+    console.error("AI Chat failed:", e);
+    appendAIChatLog('system', "Error: " + e.message);
+  }
+  
+  if (logEl) logEl.scrollTop = logEl.scrollHeight;
+}
+
+function appendAIChatLog(sender, text) {
+  var logEl = document.getElementById('ai-chat-logs');
+  if (!logEl) return;
+  
+  if (logEl.innerHTML.includes('Ask me anything')) {
+    logEl.innerHTML = '';
+  }
+  
+  var bubble = document.createElement('div');
+  bubble.style.padding = '.5rem .75rem';
+  bubble.style.borderRadius = '10px';
+  bubble.style.maxWidth = '85%';
+  bubble.style.fontSize = '.8rem';
+  bubble.style.lineHeight = '1.4';
+  
+  if (sender === 'user') {
+    bubble.style.alignSelf = 'flex-end';
+    bubble.style.background = 'var(--accent)';
+    bubble.style.color = '#fff';
+    bubble.innerHTML = '<strong>You:</strong> ' + escHtml(text);
+  } else if (sender === 'ai') {
+    bubble.style.alignSelf = 'flex-start';
+    bubble.style.background = 'rgba(255,255,255,.05)';
+    bubble.style.color = 'var(--text)';
+    bubble.style.border = '1px solid var(--border)';
+    bubble.innerHTML = '<strong>AI:</strong> ' + escHtml(text);
+  } else {
+    bubble.style.alignSelf = 'center';
+    bubble.style.background = 'rgba(16,185,129,.1)';
+    bubble.style.color = 'var(--success)';
+    bubble.style.border = '1px solid rgba(16,185,129,.2)';
+    bubble.style.fontSize = '.72rem';
+    bubble.innerHTML = '⚙️ ' + escHtml(text);
+  }
+  
+  logEl.appendChild(bubble);
+}
+
+function clearAIChat() {
+  var logEl = document.getElementById('ai-chat-logs');
+  if (logEl) {
+    logEl.innerHTML = '<div style="color:var(--text3);font-style:italic;text-align:center;margin-top:2.5rem">Ask me anything by typing below or clicking the mic!</div>';
+  }
+}
+
+async function generateAISubtasks(id) {
+  var t = tasks.find(function(x){ return x.id === id; });
+  if (!t) return;
+  
+  var confirmPlan = confirm('Ask Groq AI to generate 3 actionable sub-steps for: "' + t.title + '"? (This will overwrite description)');
+  if (!confirmPlan) return;
+  
+  var itemEl = document.querySelector('.task-item[data-id="' + id + '"]');
+  if (itemEl) itemEl.style.opacity = '0.5';
+  
+  try {
+    var systemPrompt = "You are a productivity expert. Break down the user's task into exactly 3 very short, actionable steps. Prefix each with a bullet (•) and keep them under 8 words each.";
+    var userPrompt = "Task: " + t.title + ". Break it down.";
+    
+    var steps = await callGroq(systemPrompt, userPrompt);
+    t.desc = steps;
+    saveData('tasks', tasks);
+    renderTasks();
+  } catch(e) {
+    console.error("AI Planner failed:", e);
+    alert('AI Planner failed: ' + e.message);
+  } finally {
+    if (itemEl) itemEl.style.opacity = '1';
+  }
+}
+
+// ── FREESOUND SEARCH ──
+var fsPreviewAudio = null;
+
+async function searchFreesound() {
+  var q = document.getElementById('fs-search-input').value.trim();
+  if (!q) { alert('Please type a search query!'); return; }
+  var listEl = document.getElementById('fs-results-list');
+  listEl.innerHTML = '<div style="color:var(--text3);font-size:.85rem;text-align:center;padding:1.5rem">Searching Freesound.org... 🔍</div>';
+  
+  try {
+    var url = 'https://freesound.org/apiv2/search/text/?query=' + encodeURIComponent(q) + 
+              '&token=' + FREESOUND_TOKEN + 
+              '&fields=id,name,previews,duration&page_size=8';
+              
+    var r = await fetch(url);
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    var res = await r.json();
+    
+    if (!res.results || res.results.length === 0) {
+      listEl.innerHTML = '<div style="color:var(--text3);font-size:.85rem;text-align:center;padding:1.5rem">No sounds found. Try another search terms.</div>';
+      return;
+    }
+    
+    listEl.innerHTML = res.results.map(function(s) {
+      var mp3 = s.previews['preview-hq-mp3'] || s.previews['preview-lq-mp3'];
+      var duration = Math.round(s.duration);
+      return '<div class="glass-card" style="padding:.75rem;display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">'+
+        '<div style="flex:1;min-width:0;margin-right:8px">'+
+          '<div style="font-weight:600;font-size:.85rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + escHtml(s.name) + '</div>'+
+          '<div style="font-size:.7rem;color:var(--text3)">Duration: ' + duration + 's</div>'+
+        '</div>'+
+        '<div style="display:flex;gap:6px">'+
+          '<button class="btn btn-secondary btn-sm" onclick="previewCustomAudio(\'' + mp3 + '\')">▶ Play</button>'+
+          '<button class="btn btn-primary btn-sm" onclick="selectFreesoundSound(\'' + escAttr(s.name) + '\',\'' + mp3 + '\')">Select</button>'+
+        '</div>'+
+      '</div>';
+    }).join('');
+  } catch (e) {
+    console.error("Freesound search failed:", e);
+    listEl.innerHTML = '<div style="color:var(--danger);font-size:.85rem;text-align:center;padding:1.5rem">Search failed: ' + e.message + '</div>';
+  }
+}
+
+function previewCustomAudio(url) {
+  if (fsPreviewAudio) {
+    fsPreviewAudio.pause();
+  }
+  fsPreviewAudio = new Audio(url);
+  fsPreviewAudio.volume = settings.alarmVolume || 0.8;
+  fsPreviewAudio.play().catch(function(e){ console.error('Audio play failed:', e); });
+}
+
+function selectFreesoundSound(name, url) {
+  if (fsPreviewAudio) {
+    fsPreviewAudio.pause();
+    fsPreviewAudio = null;
+  }
+  
+  var selectEl = document.getElementById('a-sound');
+  var opt = document.createElement('option');
+  opt.value = url;
+  opt.textContent = '🔊 ' + name.slice(0, 22) + '...';
+  opt.selected = true;
+  selectEl.appendChild(opt);
+  
+  if (!settings.customSounds) settings.customSounds = [];
+  if (!settings.customSounds.some(function(s){ return s.url === url; })) {
+    settings.customSounds.push({ name: name, url: url });
+    saveSettings();
+  }
+  
+  closeModal('freesound-modal');
+  alert('Alarm tone set: ' + name);
+}
+
+// ── UTILS ──
+function escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escAttr(s){ return String(s||'').replace(/"/g,'&quot;'); }
+</script>
+</body>
+</html>

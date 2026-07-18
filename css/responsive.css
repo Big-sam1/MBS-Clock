@@ -1,0 +1,203 @@
+/* Smart Alarm Pro - Responsive layout rules */
+
+/* Mobile Bottom Navigation Bar */
+.app-bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  height: 65px;
+  background: rgba(10, 15, 30, 0.7);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border-top: 1px solid var(--glass-border);
+  z-index: 100;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0 1rem;
+}
+
+.bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-speed);
+}
+
+.bottom-nav-item svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2;
+  fill: none;
+}
+
+.bottom-nav-item.active {
+  color: var(--accent-color);
+}
+
+/* ==========================================
+   BREAKPOINTS
+   ========================================== */
+
+/* 1. Tablet view (max-width: 1024px) */
+@media (max-width: 1024px) {
+  .app-sidebar {
+    width: 240px;
+    padding: 1.5rem 1rem;
+  }
+  
+  .brand-name {
+    font-size: 1.1rem;
+  }
+  
+  .view-container {
+    padding: 2rem;
+  }
+  
+  .top-header {
+    padding: 0 2rem;
+  }
+}
+
+/* 2. Mobile View (max-width: 768px) */
+@media (max-width: 768px) {
+  body {
+    overflow: auto; /* Allow overflow if contents stretch on mobile */
+  }
+
+  #app-container {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+    padding-bottom: 65px; /* space for bottom nav */
+  }
+
+  .app-sidebar {
+    display: none; /* Hide sidebar completely */
+  }
+
+  .app-bottom-nav {
+    display: flex; /* Show mobile bottom nav */
+  }
+
+  .app-main {
+    height: auto;
+    min-height: calc(100vh - 65px);
+    overflow: visible;
+  }
+
+  .top-header {
+    height: 60px;
+    padding: 0 1.5rem;
+    position: sticky;
+    top: 0;
+    background: rgba(11, 15, 25, 0.7);
+    border-bottom: 1px solid var(--glass-border);
+  }
+
+  .view-container {
+    padding: 1.5rem 1.25rem;
+    height: auto;
+    overflow: visible;
+  }
+
+  .view-title-container {
+    margin-bottom: 1.5rem;
+  }
+
+  .view-title {
+    font-size: 1.75rem;
+  }
+
+  /* Grid adaptations */
+  .dashboard-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.25rem !important;
+  }
+
+  .alarms-list-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .timer-split-layout {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .calendar-main-layout {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .settings-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Clock sizing */
+  .analog-clock {
+    width: 180px;
+    height: 180px;
+  }
+  
+  .clock-number-12 { top: 14%; }
+  .clock-number-3  { left: 86%; }
+  .clock-number-6  { top: 86%; }
+  .clock-number-9  { left: 14%; }
+  
+  .hour-hand { height: 45px; }
+  .minute-hand { height: 60px; }
+  .second-hand { height: 70px; }
+
+  /* Ring modal scaling */
+  .ring-pulsator-container {
+    width: 220px;
+    height: 220px;
+    margin-bottom: 1.5rem;
+  }
+
+  .ring-pulsator {
+    width: 180px;
+    height: 180px;
+  }
+
+  .ring-clock-face {
+    width: 130px;
+    height: 130px;
+  }
+
+  .ring-clock-icon {
+    width: 44px;
+    height: 44px;
+  }
+
+  .ring-alarm-title {
+    font-size: 2rem;
+  }
+
+  .ring-actions-grid {
+    grid-template-columns: repeat(3, 90px);
+    gap: 12px;
+  }
+
+  .ring-action-btn .btn-round {
+    width: 52px;
+    height: 52px;
+  }
+
+  .ring-action-btn .btn-round svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* Notifications dropdown positioning */
+  #notifications-dropdown {
+    top: 70px;
+    right: 1.5rem;
+    width: calc(100vw - 3rem);
+  }
+}

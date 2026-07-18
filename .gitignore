@@ -1,0 +1,7 @@
+# Private API credentials — NEVER commit these files to GitHub
+config.js
+config.example.js
+
+# OS files
+.DS_Store
+Thumbs.db
