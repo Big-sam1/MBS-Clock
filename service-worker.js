@@ -6,7 +6,9 @@ const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/favi.png'
+  '/favi.png',
+  '/icon-192.png',
+  '/icon-512.png'
 ];
 
 // Install — pre-cache core assets individually so one failure doesn't break the whole SW
