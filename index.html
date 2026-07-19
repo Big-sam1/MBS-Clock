@@ -896,7 +896,7 @@ var settings = loadSettings();
 var alarms   = loadData('alarms');
 var tasks    = loadData('tasks');
 var habits   = loadData('habits');
-var history  = loadData('alarm_history');
+var alarmHistory = loadData('alarm_history');
 var worldTZs = loadData('world_tzs');
 if (!worldTZs.length) worldTZs = [
   {name:'London',tz:'Europe/London'},
@@ -1374,9 +1374,21 @@ function stopRing(){
   }catch(e){ console.error('stopRing error:',e); }
 }
 
+function deactivateOneTimeAlarm(id){
+  var a = alarms.find(function(x){ return x.id === id; });
+  if(a && (!a.repeat || a.repeat.length === 0)) {
+    a.active = false;
+    saveData('alarms', alarms);
+  }
+}
+
 function dismissAlarm(){
   try{
-    if(currentAlarm) logHistory(currentAlarm,'dismissed');
+    if(currentAlarm) {
+      var id = currentAlarm.id;
+      logHistory(currentAlarm,'dismissed');
+      deactivateOneTimeAlarm(id);
+    }
     stopRing();
     renderAll();
     navigateTo('dashboard');
@@ -1404,12 +1416,14 @@ function snoozeAlarm(){
 function completeAlarm(){
   try{
     if(currentAlarm){
+      var id = currentAlarm.id;
       var title = (currentAlarm.title||'').trim().toLowerCase();
       tasks.forEach(function(t){
         if(t.title && t.title.trim().toLowerCase()===title) t.done=true;
       });
       saveData('tasks',tasks);
       logHistory(currentAlarm,'completed');
+      deactivateOneTimeAlarm(id);
     }
     stopRing();
     confetti();
@@ -1425,9 +1439,9 @@ function stopMusic(){ stopAudio(); }
 
 function logHistory(a,action){
   if(!a) return;
-  history.unshift({id:uid(),title:a.title,time:a.time,action:action,ts:Date.now()});
-  if(history.length>50) history.pop();
-  saveData('alarm_history',history);
+  alarmHistory.unshift({id:uid(),title:a.title,time:a.time,action:action,ts:Date.now()});
+  if(alarmHistory.length>50) alarmHistory.pop();
+  saveData('alarm_history',alarmHistory);
   updateNotifBadge();
 }
 
@@ -2241,7 +2255,7 @@ function updateNotifStatus(){
 function updateNotifBadge(){
   var badge=document.getElementById('notif-badge');
   if(!badge) return;
-  if(history.length>0){ badge.textContent=history.length; badge.style.display='flex'; }
+  if(alarmHistory.length>0){ badge.textContent=alarmHistory.length; badge.style.display='flex'; }
   else badge.style.display='none';
 }
 function toggleNotifDrop(){
@@ -2252,15 +2266,15 @@ function toggleNotifDrop(){
 document.addEventListener('click',function(e){ if(!e.target.closest('#notif-btn')&&!e.target.closest('#notif-drop')) document.getElementById('notif-drop').style.display='none'; });
 function renderNotifDrop(){
   var el=document.getElementById('notif-list'); if(!el) return;
-  if(!history.length){ el.innerHTML='<div style="color:var(--text3);font-size:.82rem;text-align:center;padding:.5rem">No history.</div>'; return; }
-  el.innerHTML=history.slice(0,15).map(function(h){
+  if(!alarmHistory.length){ el.innerHTML='<div style="color:var(--text3);font-size:.82rem;text-align:center;padding:.5rem">No history.</div>'; return; }
+  el.innerHTML=alarmHistory.slice(0,15).map(function(h){
     var colors={dismissed:'var(--accent2)',snoozed:'var(--warn)',completed:'var(--success)',missed:'var(--danger)'};
     return '<div style="padding:.5rem;border-bottom:1px solid rgba(255,255,255,.04);font-size:.8rem">'+
       '⏰ <strong>'+escHtml(h.title)+'</strong> was <span style="color:'+colors[h.action]+'">'+h.action+'</span>'+
       '<div style="font-size:.7rem;color:var(--text3)">'+new Date(h.ts).toLocaleString()+'</div></div>';
   }).join('');
 }
-function clearHistory(){ history=[]; saveData('alarm_history',history); renderNotifDrop(); updateNotifBadge(); }
+function clearHistory(){ alarmHistory=[]; saveData('alarm_history',alarmHistory); renderNotifDrop(); updateNotifBadge(); }
 
 // ── BACKUP ──
 function exportBackup(){
@@ -2454,7 +2468,8 @@ async function callGroq(systemPrompt, userPrompt) {
   }
 
   if (!data.reply) {
-    throw new Error('No reply field in server response.');
+    console.error('Groq Response Data:', data);
+    throw new Error('No reply field in server response. Received: ' + JSON.stringify(data));
   }
 
   return data.reply.trim();
